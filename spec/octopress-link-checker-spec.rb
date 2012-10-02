@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'octopress-link-checker'
 
 describe OctopressLinkChecker, "hello" do
