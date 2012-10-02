@@ -1,2 +1,4 @@
- require 'simplecov'
- SimpleCov.start
+require 'fakeweb'
+
+require 'simplecov'
+SimpleCov.start
