@@ -9,3 +9,7 @@ This Ruby gem allows you to easily check the links in your Octopress web site.
 ## Usage
 
 *coming soon*
+
+## Testing
+
+````rake spec````
