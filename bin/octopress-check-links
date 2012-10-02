@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'octopress-check-links'
+
+puts 'Hello, World'
