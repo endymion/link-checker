@@ -1,5 +1,6 @@
 require 'find'
 require 'nokogiri'
+require 'net/http'
 
 class OctopressLinkChecker
 
@@ -22,6 +23,10 @@ class OctopressLinkChecker
   def self.find_external_links(target_path)
     all_links = Nokogiri::HTML(open(target_path)).css('a')
     external_links = all_links.select{|link| link.attribute('href').value =~ /^http/ }
+  end
+
+  def self.check_link(uri)
+    Net::HTTP.get_response(URI.parse(uri)).class.eql? Net::HTTPOK
   end
 
 end

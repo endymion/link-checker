@@ -15,12 +15,14 @@ describe OctopressLinkChecker, "Link checker" do
   end
 
   it "checks links" do
-    FakeWeb.register_uri(:any, "http://goodlink.com",
-      :body => "Yay it worked.")
-    FakeWeb.register_uri(:get, "http://brokenlink.com",
-      :body => "File not found", :status => ["404", "Missing"])
+    good_uri = 'http://goodlink.com'
+    FakeWeb.register_uri(:any, good_uri, :body => "Yay it worked.")
+    OctopressLinkChecker.check_link(good_uri).should be true
 
-    Net::HTTP.get_response(URI.parse("http://goodlink.com"))
+    bad_uri = 'http://brokenlink.com'
+    FakeWeb.register_uri(:get, bad_uri,
+      :body => "File not found", :status => ["404", "Missing"])
+    OctopressLinkChecker.check_link(bad_uri).should_not be true    
   end
 
 end
