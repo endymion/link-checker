@@ -34,27 +34,21 @@ module Link
     end
 
     def self.check_link(uri)
-      response =
-        if uri =~ /^http\:/
-          Net::HTTP.get_response(URI.parse(uri))
-        else
-          uri = URI.parse(uri)
-          http = Net::HTTP.new(uri.host, uri.port)
-          http.use_ssl = true if uri.scheme == "https"  # enable SSL/TLS
-          http.start {
-            http.request_get(uri.path) {|response|
-              response
-            }
-          }
+      uri = URI.parse(uri)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true if uri.scheme == "https"
+      http.start do
+        path = (uri.path.empty?) ? '/' : uri.path
+        http.request_get(path) do |response|
+          case response
+          when Net::HTTPSuccess then
+            return true
+          when Net::HTTPRedirection then
+            return self.check_link(response['location'])
+          else
+            raise Error.new(response)
+          end
         end
-
-      case response
-      when Net::HTTPSuccess then
-        return true
-      when Net::HTTPRedirection then
-        return self.check_link(response['location'])
-      else
-        raise Error.new(response)
       end
     end
 
@@ -78,6 +72,7 @@ module Link
           puts "Problem: #{file}".red
           bad_checks.each do |check|
             puts "   Link: #{check[:link].attribute('href').value}".red
+            puts "     ERROR: " + check[:error].inspect
             puts "     Response: #{check[:error].response.inspect}".red
           end
         end
