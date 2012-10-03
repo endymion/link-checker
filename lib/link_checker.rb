@@ -58,7 +58,6 @@ module Link
 
         self.class.find_external_links(file).each do |link|
           uri = link.attribute('href').value
-
           begin          
             self.class.check_link(uri)
           rescue => error
