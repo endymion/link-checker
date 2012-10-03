@@ -14,11 +14,11 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "octopress-link-checker"
-  gem.homepage = "http://github.com/endymion/octopress-check-links"
+  gem.name = "link-checker"
+  gem.homepage = "git@github.com:endymion/link-checker.git"
   gem.license = "MIT"
-  gem.summary = %Q{Check the links in an Octopress web site before deploying.}
-  gem.description = %Q{Check the links in an Octopress web site before deploying, using Nokogiri.}
+  gem.summary = %Q{Check the links in a web site before deploying.}
+  gem.description = %Q{Check the links in a web site before deploying, using Nokogiri.}
   gem.authors = ["Ryan Alyn Porter"]
   # dependencies defined in Gemfile
 end
