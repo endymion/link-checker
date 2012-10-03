@@ -61,16 +61,6 @@ describe LinkChecker do
 
   describe "prints output" do
 
-    before(:all) do
-      @uris =
-        %w{
-          http://goodlink.com
-          http://brokenlink.com
-          http://twitter.com/share
-          http://octopress.org
-        }
-    end
-
     it "prints green when the links are all good." do
       LinkChecker.stub(:check_link) { true }
       $stdout.should_receive(:puts).with(/Checked/i).exactly(3).times
@@ -84,7 +74,6 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Response/i).at_least(3).times
       LinkChecker.new(@site_path).check_links
     end
-
 
   end
 
