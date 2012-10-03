@@ -13,17 +13,14 @@ module Link
     end
 
     def find_html_files
-      html_files = []
-      Find.find(@target_path) do |path|
-        next if FileTest.directory?(path)
-        html_files << path if path =~ /\.html?$/
-      end
-      html_files
+      Find.find(@target_path).map {|path|
+        FileTest.file?(path) && (path =~ /\.html?$/) ? path : nil
+      }.reject{|path| path.nil?}
     end
 
     def self.find_external_links(file_path)
-      all_links = Nokogiri::HTML(open(file_path)).css('a')
-      external_links = all_links.select{|link| link.attribute('href').value =~ /^https?\:\/\// }
+      Nokogiri::HTML(open(file_path)).css('a').
+        select{|link| link.attribute('href').value =~ /^https?\:\/\// }
     end
 
     def self.check_link(uri)
