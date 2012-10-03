@@ -5,4 +5,4 @@ require 'link_checker'
 # Assume the 'public' directory is the site unless otherwise specified.
 site_path = ARGV[0] || 'public'
 
-Link::Checker.new(site_path).check_links
+LinkChecker.new(site_path).check_links
