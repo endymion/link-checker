@@ -22,7 +22,7 @@ module Link
             next
           end
         else
-          html_files << path if path =~ /\.html$/
+          html_files << path if path =~ /\.html?$/
         end
       end
       html_files
