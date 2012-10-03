@@ -23,7 +23,7 @@ describe Link::Checker, "Link checker" do
     bad_uri = 'http://brokenlink.com'
     FakeWeb.register_uri(:get, bad_uri,
       :body => "File not found", :status => ["404", "Missing"])
-    Link::Checker.check_link(bad_uri).should_not be true    
+    expect { Link::Checker.check_link(bad_uri) }.to raise_error(Link::Error)
   end
 
 end

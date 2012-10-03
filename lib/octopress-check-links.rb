@@ -32,7 +32,9 @@ module Link
     end
 
     def self.check_link(uri)
-      Net::HTTP.get_response(URI.parse(uri)).class.eql? Net::HTTPOK
+      response = Net::HTTP.get_response(URI.parse(uri))
+      return true if response.class.eql? Net::HTTPOK
+      raise Error.new(response)
     end
 
     def check_links
@@ -41,8 +43,11 @@ module Link
 
         self.class.find_external_links(file).each do |link|
           uri = link.attribute('href').value
-          unless self.class.check_link(uri)
-            bad_links << link
+
+          begin          
+            self.class.check_link(uri)
+          rescue => e
+            bad_links << [link, e]
           end
         end
         
@@ -51,13 +56,22 @@ module Link
         else
           puts "Problem: #{file}".red
           bad_links.each do |link|
-            puts "   Link: #{link.attribute('href').value}".red
+            puts "   Link: #{link.first.attribute('href').value}".red
+            puts "     Response: #{link.last.response.inspect}".red
           end
         end
 
       end
+
     end
 
+  end
+
+  class Error < StandardError
+    attr_accessor :response
+    def initialize(response)
+      @response = response
+    end
   end
 
 end
