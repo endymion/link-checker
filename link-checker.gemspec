@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/check-links",
     "lib/link_checker.rb",
+    "link-checker.gemspec",
     "spec/link-checker_spec.rb",
     "spec/spec_helper.rb",
     "spec/test-site/.gitignore",
@@ -364,7 +365,7 @@ Gem::Specification.new do |s|
     "spec/test-site/source/javascripts/pinboard.js",
     "spec/test-site/source/javascripts/twitter.js"
   ]
-  s.homepage = "git@github.com:endymion/link-checker.git"
+  s.homepage = "https://github.com/endymion/link-checker"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.15"
