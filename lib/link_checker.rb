@@ -1,6 +1,8 @@
 require 'find'
 require 'nokogiri'
 require 'net/http'
+require 'net/https'
+require 'uri'
 
 module Link
 
@@ -28,11 +30,23 @@ module Link
 
     def self.find_external_links(file_path)
       all_links = Nokogiri::HTML(open(file_path)).css('a')
-      external_links = all_links.select{|link| link.attribute('href').value =~ /^http/ }
+      external_links = all_links.select{|link| link.attribute('href').value =~ /^https?\:\/\// }
     end
 
     def self.check_link(uri)
-      response = Net::HTTP.get_response(URI.parse(uri))
+      response =
+        if uri =~ /^http\:/
+          Net::HTTP.get_response(URI.parse(uri))
+        else
+          uri = URI.parse(uri)
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.use_ssl = true if uri.scheme == "https"  # enable SSL/TLS
+          http.start {
+            http.request_get(uri.path) {|response|
+              response
+            }
+          }
+        end
 
       case response
       when Net::HTTPSuccess then
