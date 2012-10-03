@@ -3,8 +3,12 @@ require 'link_checker'
 
 describe Link::Checker do
 
+  before(:all) do
+    @site_path = 'spec/test-site/public/'
+  end
+
   it "finds all of the HTML files in the target path." do
-    checker = Link::Checker.new('spec/test-site/public/')
+    checker = Link::Checker.new(@site_path)
     files = checker.find_html_files
     files.size.should == 3
   end
@@ -53,6 +57,35 @@ describe Link::Checker do
       end
 
     end
+
+  end
+
+  describe "prints output" do
+
+    before(:all) do
+      @uris =
+        %w{
+          http://goodlink.com
+          http://brokenlink.com
+          http://twitter.com/share
+          http://octopress.org
+        }
+    end
+
+    it "prints green when the links are all good." do
+      Link::Checker.stub(:check_link) { true }
+      $stdout.should_receive(:puts).with(/Checked/i).exactly(3).times
+      Link::Checker.new(@site_path).check_links
+    end
+
+    it "prints green when the links are all bad." do
+      Link::Checker.stub(:check_link).and_raise Link::Error.new('blah')
+      $stdout.should_receive(:puts).with(/Problem/i).exactly(3).times
+      $stdout.should_receive(:puts).with(/Link/i).at_least(3).times
+      $stdout.should_receive(:puts).with(/Response/i).at_least(3).times
+      Link::Checker.new(@site_path).check_links
+    end
+
 
   end
 

@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'net/http'
 require 'net/https'
 require 'uri'
+require 'colorize'
 
 module Link
 
@@ -48,7 +49,7 @@ module Link
 
         self.class.find_external_links(file).each do |link|
           uri = link.attribute('href').value
-          begin          
+          begin
             self.class.check_link(uri)
           rescue => error
             bad_checks << { :link => link, :error => error }
