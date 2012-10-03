@@ -33,31 +33,38 @@ module Link
 
     def self.check_link(uri)
       response = Net::HTTP.get_response(URI.parse(uri))
-      return true if response.class.eql? Net::HTTPOK
-      raise Error.new(response)
+
+      case response
+      when Net::HTTPSuccess then
+        return true
+      when Net::HTTPRedirection then
+        return self.check_link(response['location'])
+      else
+        raise Error.new(response)
+      end
     end
 
     def check_links
       find_html_files.each do |file|
-        bad_links = []  
+        bad_checks = []  
 
         self.class.find_external_links(file).each do |link|
           uri = link.attribute('href').value
 
           begin          
             self.class.check_link(uri)
-          rescue => e
-            bad_links << [link, e]
+          rescue => error
+            bad_checks << { :link => link, :error => error }
           end
         end
         
-        if bad_links.empty?
+        if bad_checks.empty?
           puts "Checked: #{file}".green
         else
           puts "Problem: #{file}".red
-          bad_links.each do |link|
-            puts "   Link: #{link.first.attribute('href').value}".red
-            puts "     Response: #{link.last.response.inspect}".red
+          bad_checks.each do |check|
+            puts "   Link: #{check[:link].attribute('href').value}".red
+            puts "     Response: #{check[:error].response.inspect}".red
           end
         end
 
