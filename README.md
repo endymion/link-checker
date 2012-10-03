@@ -8,6 +8,8 @@ Add the ```link-checker``` gem to your project's ```Gemfile```:
 
     gem "link-checker"
 
+Then ```bundle install``` to install the gem.
+
 ## Usage
 
 You can use the ```check-links``` command to specify any directory to scan for HTML files.  It will scan each ```.html``` or ```.htm``` file and then check each link within each file.
