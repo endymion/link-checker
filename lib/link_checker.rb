@@ -15,15 +15,8 @@ module Link
     def find_html_files
       html_files = []
       Find.find(@target_path) do |path|
-        if FileTest.directory?(path)
-          if File.basename(path)[0] == '..'
-            Find.prune
-          else
-            next
-          end
-        else
-          html_files << path if path =~ /\.html?$/
-        end
+        next if FileTest.directory?(path)
+        html_files << path if path =~ /\.html?$/
       end
       html_files
     end
