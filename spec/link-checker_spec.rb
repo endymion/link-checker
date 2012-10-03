@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'octopress-check-links'
+require 'link_checker'
 
 describe Link::Checker, "Link checker" do
 
