@@ -6,23 +6,5 @@ require 'colorize'
 # Assume the 'public' directory is the site unless otherwise specified.
 site_path = ARGV[0] || 'public'
 
-OctopressLinkChecker.find_html_files(site_path).each do |file|
-  bad_links = []  
-
-  OctopressLinkChecker.find_external_links(file).each do |link|
-    uri = link.attribute('href').value
-    unless OctopressLinkChecker.check_link(uri)
-      bad_links << link
-    end
-  end
-  
-  if bad_links.empty?
-    puts "Checked: #{file}".green
-  else
-    puts "Problem: #{file}".red
-    bad_links.each do |link|
-      puts "  Link: #{link.attribute('href').value}".red
-    end
-  end
-
-end
+checker = Link::Checker.new(site_path)
+checker.check_links
