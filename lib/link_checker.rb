@@ -72,13 +72,10 @@ module Link
           puts "Problem: #{file}".red
           bad_checks.each do |check|
             puts "   Link: #{check[:link].attribute('href').value}".red
-            puts "     ERROR: " + check[:error].inspect
             puts "     Response: #{check[:error].response.inspect}".red
           end
         end
-
       end
-
     end
 
   end
