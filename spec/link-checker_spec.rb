@@ -32,7 +32,7 @@ describe LinkChecker do
     end
 
     it "declares good links to be good." do
-      LinkChecker.check_link(@good_uri).should be true
+      LinkChecker.check_link(@good_uri).class.should be LinkChecker::Good
     end
 
     it "declares bad links to be bad." do
@@ -45,7 +45,9 @@ describe LinkChecker do
       it "declares good redirect targets to be good." do
         FakeWeb.register_uri(:get, @redirect_uri,
           :location => @good_uri, :status => ["302", "Moved"])
-        LinkChecker.check_link(@redirect_uri).should be true
+        result = LinkChecker.check_link(@redirect_uri)
+        result.class.should be LinkChecker::Redirect
+        result.final_destination.to_s.should == @good_uri
       end
 
       it "declares bad redirect targets to be bad." do
