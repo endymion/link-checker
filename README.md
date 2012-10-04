@@ -14,7 +14,7 @@ Then ```bundle install``` to install the gem.
 
 ## Usage
 
-You can use the ```check-links``` command to specify any directory to scan for HTML files.
+You can use the ```check-links [PATH]``` command to specify any directory to scan for HTML files.  The default path is ```./```.
 
 For example, to check the links for an Octopress site:
 
