@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "link-checker"
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Alyn Porter"]
@@ -381,6 +381,8 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_development_dependency(%q<simplecov>, ["~> 0.6.4"])
       s.add_development_dependency(%q<fakeweb>, ["~> 1.3.0"])
+      s.add_development_dependency(%q<yard>, ["~> 0.8.2.1"])
+      s.add_development_dependency(%q<redcarpet>, ["~> 2.1.1"])
       s.add_development_dependency(%q<debugger>, [">= 0"])
     else
       s.add_dependency(%q<nokogiri>, ["~> 1.5.5"])
@@ -389,6 +391,8 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_dependency(%q<simplecov>, ["~> 0.6.4"])
       s.add_dependency(%q<fakeweb>, ["~> 1.3.0"])
+      s.add_dependency(%q<yard>, ["~> 0.8.2.1"])
+      s.add_dependency(%q<redcarpet>, ["~> 2.1.1"])
       s.add_dependency(%q<debugger>, [">= 0"])
     end
   else
@@ -398,6 +402,8 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
     s.add_dependency(%q<simplecov>, ["~> 0.6.4"])
     s.add_dependency(%q<fakeweb>, ["~> 1.3.0"])
+    s.add_dependency(%q<yard>, ["~> 0.8.2.1"])
+    s.add_dependency(%q<redcarpet>, ["~> 2.1.1"])
     s.add_dependency(%q<debugger>, [">= 0"])
   end
 end
