@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "link-checker"
-  s.version = "0.0.0"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Alyn Porter"]
-  s.date = "2012-10-03"
+  s.date = "2012-10-04"
   s.description = "Check the links in a web site before deploying, using Nokogiri."
   s.executables = ["check-links"]
   s.extra_rdoc_files = [
@@ -368,7 +368,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/endymion/link-checker"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.15"
+  s.rubygems_version = "1.8.24"
   s.summary = "Check the links in a web site before deploying."
 
   if s.respond_to? :specification_version then
@@ -380,16 +380,16 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rspec>, ["~> 2.11.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_development_dependency(%q<simplecov>, ["~> 0.6.4"])
-      s.add_development_dependency(%q<ruby-debug19>, ["~> 0.11.6"])
       s.add_development_dependency(%q<fakeweb>, ["~> 1.3.0"])
+      s.add_development_dependency(%q<debugger>, [">= 0"])
     else
       s.add_dependency(%q<nokogiri>, ["~> 1.5.5"])
       s.add_dependency(%q<colorize>, ["~> 0.5.8"])
       s.add_dependency(%q<rspec>, ["~> 2.11.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_dependency(%q<simplecov>, ["~> 0.6.4"])
-      s.add_dependency(%q<ruby-debug19>, ["~> 0.11.6"])
       s.add_dependency(%q<fakeweb>, ["~> 1.3.0"])
+      s.add_dependency(%q<debugger>, [">= 0"])
     end
   else
     s.add_dependency(%q<nokogiri>, ["~> 1.5.5"])
@@ -397,8 +397,8 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rspec>, ["~> 2.11.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
     s.add_dependency(%q<simplecov>, ["~> 0.6.4"])
-    s.add_dependency(%q<ruby-debug19>, ["~> 0.11.6"])
     s.add_dependency(%q<fakeweb>, ["~> 1.3.0"])
+    s.add_dependency(%q<debugger>, [">= 0"])
   end
 end
 
