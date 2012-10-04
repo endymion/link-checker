@@ -19,7 +19,10 @@ class LinkChecker
 
   def self.find_external_links(file_path)
     Nokogiri::HTML(open(file_path)).css('a').
-      select{|link| link.attribute('href').value =~ /^https?\:\/\// }
+      select do |link|
+        !link.attribute('href').nil? &&
+        link.attribute('href').value =~ /^https?\:\/\//
+      end
   end
 
   def self.check_link(uri, redirected=false)
@@ -49,7 +52,6 @@ class LinkChecker
     find_html_files.each do |file|
       bad_checks = []
       warnings = []
-
       self.class.find_external_links(file).each do |link|
         uri = link.attribute('href').value
         begin
