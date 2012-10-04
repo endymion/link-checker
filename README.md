@@ -31,3 +31,7 @@ The ```link-checker``` gem uses [RSpec](http://rspec.info) for testing and has 1
 Run the specs with:
 
     rake spec
+
+## API Documentation
+
+The Yardoc documenation is hosted on [RubyDoc.info](http://rubydoc.info/github/endymion/link-checker/frames).
