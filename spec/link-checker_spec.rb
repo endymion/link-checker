@@ -64,16 +64,24 @@ describe LinkChecker do
   describe "prints output" do
 
     it "prints green when the links are all good." do
-      LinkChecker.stub(:check_link) { true }
+      LinkChecker.stub(:check_link) { LinkChecker::Good.new }
       $stdout.should_receive(:puts).with(/Checked/i).exactly(3).times
       LinkChecker.new(@site_path).check_links
     end
 
-    it "prints green when the links are all bad." do
+    it "prints red when the links are all bad." do
       LinkChecker.stub(:check_link).and_raise LinkChecker::Error.new('blah')
       $stdout.should_receive(:puts).with(/Problem/i).exactly(3).times
       $stdout.should_receive(:puts).with(/Link/i).at_least(3).times
       $stdout.should_receive(:puts).with(/Response/i).at_least(3).times
+      LinkChecker.new(@site_path).check_links
+    end
+
+    it "prints yellow warnings when the links redirect." do
+      LinkChecker.stub(:check_link) { LinkChecker::Redirect.new('http://somewhere') }
+      $stdout.should_receive(:puts).with(/Checked/i).exactly(3).times
+      $stdout.should_receive(:puts).with(/Warning/i).at_least(3).times
+      $stdout.should_receive(:puts).with(/Redirected/i).at_least(3).times
       LinkChecker.new(@site_path).check_links
     end
 
