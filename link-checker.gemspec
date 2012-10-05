@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "link-checker"
-  s.version = "0.2.0"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Alyn Porter"]
-  s.date = "2012-10-04"
+  s.date = "2012-10-05"
   s.description = "Check the links in a web site before deploying, using Nokogiri."
   s.executables = ["check-links"]
   s.extra_rdoc_files = [
@@ -368,7 +368,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/endymion/link-checker"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.15"
+  s.rubygems_version = "1.8.24"
   s.summary = "Check the links in a web site before deploying."
 
   if s.respond_to? :specification_version then
@@ -377,6 +377,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<nokogiri>, ["~> 1.5.5"])
       s.add_runtime_dependency(%q<colorize>, ["~> 0.5.8"])
+      s.add_runtime_dependency(%q<anemone>, ["~> 0.7.2"])
       s.add_development_dependency(%q<rspec>, ["~> 2.11.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_development_dependency(%q<simplecov>, ["~> 0.6.4"])
@@ -387,6 +388,7 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<nokogiri>, ["~> 1.5.5"])
       s.add_dependency(%q<colorize>, ["~> 0.5.8"])
+      s.add_dependency(%q<anemone>, ["~> 0.7.2"])
       s.add_dependency(%q<rspec>, ["~> 2.11.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_dependency(%q<simplecov>, ["~> 0.6.4"])
@@ -398,6 +400,7 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<nokogiri>, ["~> 1.5.5"])
     s.add_dependency(%q<colorize>, ["~> 0.5.8"])
+    s.add_dependency(%q<anemone>, ["~> 0.7.2"])
     s.add_dependency(%q<rspec>, ["~> 2.11.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
     s.add_dependency(%q<simplecov>, ["~> 0.6.4"])
