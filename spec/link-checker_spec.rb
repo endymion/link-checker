@@ -70,7 +70,7 @@ describe LinkChecker do
 
   end
 
-  describe "prints output" do
+  describe "scans a file path and prints output" do
 
     before(:each) do
       LinkChecker.any_instance.stub(:html_file_paths) {
@@ -125,6 +125,15 @@ describe LinkChecker do
       thread.join
     end
 
+  end
+
+  it "crawls a web site." do
+    LinkChecker.stub(:external_link_uri_strings).and_return(['http://something.com'])
+    LinkChecker.stub(:check_uri) do
+      LinkChecker::Good.new(:uri_string => 'http://something.com')
+    end
+    $stdout.should_receive(:puts).with(/Checked/i).once
+    LinkChecker.new('http://pretty-sure-this-is-not-real.com').check_uris
   end
 
 end

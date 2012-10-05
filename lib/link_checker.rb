@@ -4,6 +4,7 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 require 'colorize'
+require 'anemone'
 
 class LinkChecker
 

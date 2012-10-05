@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'link_checker'
-require 'uri'
-require 'anemone'
 
 # Assume the 'public' directory is the site unless otherwise specified.
 target = ARGV[0] || './'
