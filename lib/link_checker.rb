@@ -11,26 +11,20 @@ class LinkChecker
     @target = target
   end
 
-  def scan_files_for_links
-    self
-  end
-
-  def self.find_html_files(target_path)
-    Find.find(target_path).map {|path|
+  def html_file_paths
+    Find.find(@target).map {|path|
       FileTest.file?(path) && (path =~ /\.html?$/) ? path : nil
     }.reject{|path| path.nil?}
   end
 
-  def self.find_external_links(file_path)
-    Nokogiri::HTML(open(file_path)).css('a').
-      select do |link|
+  def self.external_link_uris(file_path)
+    Nokogiri::HTML(open(file_path)).css('a').select {|link|
         !link.attribute('href').nil? &&
         link.attribute('href').value =~ /^https?\:\/\//
-      end
+    }.map{|link| URI(link.attributes['href'].value)}
   end
 
-  def self.check_link(uri, redirected=false)
-    uri = URI.parse(uri)
+  def self.check_uri(uri, redirected=false)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.scheme == "https"
     http.start do
@@ -44,7 +38,7 @@ class LinkChecker
             return Good.new
           end
         when Net::HTTPRedirection then
-          return self.check_link(response['location'], true)
+          return self.check_uri(URI(response['location']), true)
         else
           raise Error.new(response)
         end
@@ -52,19 +46,18 @@ class LinkChecker
     end
   end
 
-  def check_links
-    self.class.find_html_files(@target_path).each do |file|
+  def check_uris
+    html_file_paths.each do |file|
       bad_checks = []
       warnings = []
-      self.class.find_external_links(file).each do |link|
-        uri = link.attribute('href').value
+      self.class.external_link_uris(file).each do |uri|
         begin
-          response = self.class.check_link(uri)
+          response = self.class.check_uri(uri)
           if response.class.eql? Redirect
-            warnings << { :link => link, :response => response }
+            warnings << { :uri => uri, :response => response }
           end
         rescue => error
-          bad_checks << { :link => link, :response => error }
+          bad_checks << { :uri => uri, :response => error }
         end
       end
       
@@ -75,13 +68,13 @@ class LinkChecker
           puts "Checked: #{file}".yellow
         end
         warnings.each do |warning|
-          puts "   Warning: #{warning[:link].attribute('href').value}".yellow
+          puts "   Warning: #{warning[:uri].to_s}".yellow
           puts "     Redirected to: #{warning[:response].final_destination.to_s}".yellow
         end
       else
         puts "Problem: #{file}".red
         bad_checks.each do |check|
-          puts "   Link: #{check[:link].attribute('href').value}".red
+          puts "   Link: #{check[:uri].to_s}".red
           puts "     Response: #{check[:response].response.inspect}".red
         end
       end
