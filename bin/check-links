@@ -1,8 +1,16 @@
 #!/usr/bin/env ruby
 
 require 'link_checker'
+require 'uri'
+require 'anemone'
 
 # Assume the 'public' directory is the site unless otherwise specified.
-site_path = ARGV[0] || './'
+target = ARGV[0] || './'
 
-LinkChecker.new(site_path).check_links
+if target =~ /^https?\:\/\//
+  # If the target is a URL, then crawl it looking for links.
+  LinkChecker.new(target).crawl_site_for_links.check_links
+else
+  # Otherwise look for static HTML files to scan for links.
+  LinkChecker.new(target).scan_files_for_links.check_links
+end

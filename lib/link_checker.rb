@@ -7,12 +7,16 @@ require 'colorize'
 
 class LinkChecker
 
-  def initialize(target_path)
-    @target_path = target_path
+  def initialize(target)
+    @target = target
   end
 
-  def find_html_files
-    Find.find(@target_path).map {|path|
+  def scan_files_for_links
+    self
+  end
+
+  def self.find_html_files(target_path)
+    Find.find(target_path).map {|path|
       FileTest.file?(path) && (path =~ /\.html?$/) ? path : nil
     }.reject{|path| path.nil?}
   end
@@ -49,7 +53,7 @@ class LinkChecker
   end
 
   def check_links
-    find_html_files.each do |file|
+    self.class.find_html_files(@target_path).each do |file|
       bad_checks = []
       warnings = []
       self.class.find_external_links(file).each do |link|
