@@ -58,22 +58,8 @@ class LinkChecker
     threads = []
     Anemone.crawl(@target) do |anemone|
       anemone.storage = Anemone::Storage.PStore('link-checker-crawled-pages.pstore')
-
       anemone.on_every_page do |crawled_page|
-        puts "Crawling: " + crawled_page.url.to_s
-
-        threads << Thread.new do
-          results = self.class.external_link_uri_strings(crawled_page.body).map do |uri_string|
-            begin
-              uri = URI(uri_string)
-              response = self.class.check_uri(uri)
-              { :uri_string => uri_string, :response => response }
-            rescue => error
-              { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
-            end
-          end
-          report_results(crawled_page.url.to_s, results)
-        end
+        threads << start_link_check_thread(crawled_page.body, crawled_page.url.to_s)
       end
     end
     threads.each{|thread| thread.join }
@@ -82,20 +68,24 @@ class LinkChecker
   def check_uris_in_files
     threads = []
     html_file_paths.each do |file|
-      threads << Thread.new do
-        results = self.class.external_link_uri_strings(open(file)).map do |uri_string|
-          begin
-            uri = URI(uri_string)
-            response = self.class.check_uri(uri)
-            { :uri_string => uri_string, :response => response }
-          rescue => error
-            { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
-          end
-        end
-        report_results(file, results)
-      end
+      threads << start_link_check_thread(open(file), file)
     end
     threads.each{|thread| thread.join }
+  end
+
+  def start_link_check_thread(source, source_name)
+    Thread.new do
+      results = self.class.external_link_uri_strings(source).map do |uri_string|
+        begin
+          uri = URI(uri_string)
+          response = self.class.check_uri(uri)
+          { :uri_string => uri_string, :response => response }
+        rescue => error
+          { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
+        end
+      end
+      report_results(source_name, results)
+    end
   end
       
   def report_results(file, results)

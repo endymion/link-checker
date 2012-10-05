@@ -78,7 +78,7 @@ describe LinkChecker do
       LinkChecker.stub(:external_link_uri_strings).and_return(['http://something.com'])
     end
 
-    it "prints green when the links are all good." do
+    it "prints green when the links are good." do
       LinkChecker.stub(:check_uri) do
         LinkChecker::Good.new(:uri_string => 'http://something.com')
       end
@@ -86,7 +86,7 @@ describe LinkChecker do
       LinkChecker.new(@site_path).check_uris
     end
 
-    it "prints red when the links are all bad." do
+    it "prints red when the links are bad." do
       LinkChecker.stub(:check_uri) do
         LinkChecker::Error.new(
           :uri_string => 'http://something.com',
@@ -110,6 +110,19 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Warning/i).once
       $stdout.should_receive(:puts).with(/Redirected/i).once
       LinkChecker.new(@site_path).check_uris
+    end
+
+  end
+
+  describe "prints output for invalid links and" do
+
+    it "declares them to be bad." do
+      LinkChecker.stub(:external_link_uri_strings).and_return(['hQQp://!!!.com'])
+      $stdout.should_receive(:puts).with(/Problem/i).once
+      $stdout.should_receive(:puts).with(/Link/i).once
+      $stdout.should_receive(:puts).with(/Response/i).once
+      thread = LinkChecker.new(@site_path).start_link_check_thread('<html></html>', 'source.html')
+      thread.join
     end
 
   end
