@@ -56,37 +56,38 @@ class LinkChecker
 
   def check_uris_in_files
     html_file_paths.each do |file|
-      bad_checks = []
-      warnings = []
       results = self.class.external_link_uri_strings(file).map do |uri_string|
         begin
           uri = URI(uri_string)
           response = self.class.check_uri(uri)
-          if response.class.eql? Redirect
-            warnings << { :uri => uri, :response => response }
-          end
+          { :uri => uri, :response => response }
         rescue => error
-          bad_checks << { :uri => uri, :response => error }
+          { :uri => uri, :response => error }
         end
       end
+      report_results(file, results)
+    end
+  end
       
-      if bad_checks.empty?
-        message = "Checked: #{file}"
-        if warnings.empty?
-          puts message.green
-        else
-          puts message.yellow
-        end
-        warnings.each do |warning|
-          puts "   Warning: #{warning[:uri].to_s}".yellow
-          puts "     Redirected to: #{warning[:response].final_destination_uri_string}".yellow
-        end
+  def report_results(file, results)
+    bad_checks = results.select{|result| result[:response].class.eql? Error}
+    warnings = results.select{|result| result[:response].class.eql? Redirect}
+    if bad_checks.empty?
+      message = "Checked: #{file}"
+      if warnings.empty?
+        puts message.green
       else
-        puts "Problem: #{file}".red
-        bad_checks.each do |check|
-          puts "   Link: #{check[:uri].to_s}".red
-          puts "     Response: #{check[:response].to_s}".red
-        end
+        puts message.yellow
+      end
+      warnings.each do |warning|
+        puts "   Warning: #{warning[:uri].to_s}".yellow
+        puts "     Redirected to: #{warning[:response].final_destination_uri_string}".yellow
+      end
+    else
+      puts "Problem: #{file}".red
+      bad_checks.each do |check|
+        puts "   Link: #{check[:uri].to_s}".red
+        puts "     Response: #{check[:response].to_s}".red
       end
     end
   end

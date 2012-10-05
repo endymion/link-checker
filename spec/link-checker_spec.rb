@@ -81,7 +81,7 @@ describe LinkChecker do
 
     it "prints red when the links are all bad." do
       LinkChecker.stub(:check_uri) do
-        LinkChecker::Bad.new(
+        LinkChecker::Error.new(
           :uri_string => 'http://something.com',
           :response => 'No.'
         )
