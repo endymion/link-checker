@@ -40,7 +40,7 @@ class LinkChecker
         when Net::HTTPRedirection then
           return self.check_uri(URI(response['location']), true)
         else
-          raise Error.new(response)
+          return Error.new(response)
         end
       end
     end
@@ -62,10 +62,11 @@ class LinkChecker
       end
       
       if bad_checks.empty?
+        message = "Checked: #{file}"
         if warnings.empty?
-          puts "Checked: #{file}".green
+          puts message.green
         else
-          puts "Checked: #{file}".yellow
+          puts message.yellow
         end
         warnings.each do |warning|
           puts "   Warning: #{warning[:uri].to_s}".yellow
@@ -75,7 +76,7 @@ class LinkChecker
         puts "Problem: #{file}".red
         bad_checks.each do |check|
           puts "   Link: #{check[:uri].to_s}".red
-          puts "     Response: #{check[:response].response.inspect}".red
+          puts "     Response: #{check[:response].to_s}".red
         end
       end
     end
@@ -90,8 +91,8 @@ class LinkChecker
     end
   end
 
-  class Error < StandardError
-    attr_accessor :response
+  class Error
+    attr_reader :response
     def initialize(response)
       @response = response
     end

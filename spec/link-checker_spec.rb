@@ -40,8 +40,7 @@ describe LinkChecker do
     end
 
     it "declares bad links to be bad." do
-      expect { LinkChecker.check_uri(@bad_uri) }.to(
-        raise_error(LinkChecker::Error))
+      LinkChecker.check_uri(@bad_uri).class.should be LinkChecker::Error
     end
 
     describe "follows redirects to the destination and" do
@@ -57,8 +56,8 @@ describe LinkChecker do
       it "declares bad redirect targets to be bad." do
         FakeWeb.register_uri(:get, @redirect_uri.to_s,
           :location => @bad_uri.to_s, :status => ["302", "Moved"])
-        expect { LinkChecker.check_uri(@redirect_uri) }.to(
-          raise_error(LinkChecker::Error))
+        result = LinkChecker.check_uri(@redirect_uri)
+        result.class.should be LinkChecker::Error
       end
 
     end
