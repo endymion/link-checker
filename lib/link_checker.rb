@@ -62,9 +62,9 @@ class LinkChecker
           begin
             uri = URI(uri_string)
             response = self.class.check_uri(uri)
-            { :uri => uri, :response => response }
+            { :uri_string => uri_string, :response => response }
           rescue => error
-            { :uri => uri, :response => error }
+            { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
           end
         end
         report_results(file, results)
@@ -85,14 +85,14 @@ class LinkChecker
           puts message.yellow
         end
         warnings.each do |warning|
-          puts "   Warning: #{warning[:uri].to_s}".yellow
+          puts "   Warning: #{warning[:uri_string]}".yellow
           puts "     Redirected to: #{warning[:response].final_destination_uri_string}".yellow
         end
       else
         puts "Problem: #{file}".red
         bad_checks.each do |check|
-          puts "   Link: #{check[:uri].to_s}".red
-          puts "     Response: #{check[:response].to_s}".red
+          puts "   Link: #{check[:uri_string]}".red
+          puts "     Response: #{check[:response].error.to_s}".red
         end
       end
     end
@@ -119,9 +119,9 @@ class LinkChecker
   end
 
   class Error < Result
-    attr_reader :response
+    attr_reader :error
     def initialize(params)
-      @response = params[:response]
+      @error = params[:error]
     end
   end
 
