@@ -17,8 +17,8 @@ class LinkChecker
     }.reject{|path| path.nil?}
   end
 
-  def self.external_link_uri_strings(file_path)
-    Nokogiri::HTML(open(file_path)).css('a').select {|link|
+  def self.external_link_uri_strings(source)
+    Nokogiri::HTML(source).css('a').select {|link|
         !link.attribute('href').nil? &&
         link.attribute('href').value =~ /^https?\:\/\//
     }.map{|link| link.attributes['href'].value}
@@ -54,11 +54,36 @@ class LinkChecker
     end
   end
 
+  def check_uris_by_crawling
+    threads = []
+    Anemone.crawl(@target) do |anemone|
+      anemone.storage = Anemone::Storage.PStore('link-checker-crawled-pages.pstore')
+
+      anemone.on_every_page do |crawled_page|
+        puts "Crawling: " + crawled_page.url.to_s
+
+        threads << Thread.new do
+          results = self.class.external_link_uri_strings(crawled_page.body).map do |uri_string|
+            begin
+              uri = URI(uri_string)
+              response = self.class.check_uri(uri)
+              { :uri_string => uri_string, :response => response }
+            rescue => error
+              { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
+            end
+          end
+          report_results(crawled_page.url.to_s, results)
+        end
+      end
+    end
+    threads.each{|thread| thread.join }
+  end
+
   def check_uris_in_files
     threads = []
     html_file_paths.each do |file|
       threads << Thread.new do
-        results = self.class.external_link_uri_strings(file).map do |uri_string|
+        results = self.class.external_link_uri_strings(open(file)).map do |uri_string|
           begin
             uri = URI(uri_string)
             response = self.class.check_uri(uri)

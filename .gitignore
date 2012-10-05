@@ -47,3 +47,6 @@ pkg
 
 # For rubinius:
 #*.rbc
+
+# For link-checker:
+link-checker-crawled-pages.pstore
