@@ -15,7 +15,7 @@ describe LinkChecker do
     end
 
     it "finds all of the external links in an HTML file." do
-      links = LinkChecker.external_link_uris(
+      links = LinkChecker.external_link_uri_strings(
         'spec/test-site/public/blog/2012/10/02/a-list-of-links/index.html')
       links.size.should == 4
     end
@@ -50,7 +50,7 @@ describe LinkChecker do
           :location => @good_uri.to_s, :status => ["302", "Moved"])
         result = LinkChecker.check_uri(@redirect_uri)
         result.class.should be LinkChecker::Redirect
-        result.final_destination.should == @good_uri
+        result.final_destination_uri_string.should == @good_uri.to_s
       end
 
       it "declares bad redirect targets to be bad." do
@@ -68,17 +68,24 @@ describe LinkChecker do
 
     before(:each) do
       LinkChecker.any_instance.stub(:html_file_paths).and_return(['somefile.html'])
-      LinkChecker.stub(:external_link_uris).and_return([URI('http://something.com')])
+      LinkChecker.stub(:external_link_uri_strings).and_return(['http://something.com'])
     end
 
     it "prints green when the links are all good." do
-      LinkChecker.stub(:check_uri) { LinkChecker::Good.new }
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Good.new(:uri_string => 'http://something.com')
+      end
       $stdout.should_receive(:puts).with(/Checked/i).once
       LinkChecker.new(@site_path).check_uris
     end
 
     it "prints red when the links are all bad." do
-      LinkChecker.stub(:check_uri).and_raise LinkChecker::Error.new('blah')
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Bad.new(
+          :uri_string => 'http://something.com',
+          :response => 'No.'
+        )
+      end
       $stdout.should_receive(:puts).with(/Problem/i).once
       $stdout.should_receive(:puts).with(/Link/i).once
       $stdout.should_receive(:puts).with(/Response/i).once
@@ -86,7 +93,12 @@ describe LinkChecker do
     end
 
     it "prints yellow warnings when the links redirect." do
-      LinkChecker.stub(:check_uri) { LinkChecker::Redirect.new('http://somewhere') }
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Redirect.new(
+          :uri_string => 'http://something.com',
+          :final_desination => 'http://something-else.com'
+        )
+      end
       $stdout.should_receive(:puts).with(/Checked/i).once
       $stdout.should_receive(:puts).with(/Warning/i).once
       $stdout.should_receive(:puts).with(/Redirected/i).once
