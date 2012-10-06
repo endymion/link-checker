@@ -75,7 +75,8 @@ describe LinkChecker do
     before(:each) do
       LinkChecker.any_instance.stub(:html_file_paths) {
         ['spec/test-site/public/blog/2012/10/02/a-list-of-links/index.html'] }
-      LinkChecker.stub(:external_link_uri_strings).and_return(['http://something.com'])
+      LinkChecker.stub(:external_link_uri_strings).and_return(
+        ['http://something.com', 'http://something-else.com'])
     end
 
     it "prints green when the links are good." do
@@ -94,8 +95,8 @@ describe LinkChecker do
         )
       end
       $stdout.should_receive(:puts).with(/Problem/i).once
-      $stdout.should_receive(:puts).with(/Link/i).once
-      $stdout.should_receive(:puts).with(/Response/i).once
+      $stdout.should_receive(:puts).with(/Link/i).twice
+      $stdout.should_receive(:puts).with(/Response/i).twice
       LinkChecker.new(:target => @site_path).check_uris
     end
 
@@ -107,8 +108,8 @@ describe LinkChecker do
         )
       end
       $stdout.should_receive(:puts).with(/Checked/i).once
-      $stdout.should_receive(:puts).with(/Warning/i).once
-      $stdout.should_receive(:puts).with(/Redirected/i).once
+      $stdout.should_receive(:puts).with(/Warning/i).twice
+      $stdout.should_receive(:puts).with(/Redirected/i).twice
       LinkChecker.new(:target => @site_path).check_uris
     end
 
@@ -120,8 +121,8 @@ describe LinkChecker do
         )
       end
       $stdout.should_receive(:puts).with(/Checked/i).once
-      $stdout.should_receive(:puts).with(/Warning/i).once
-      $stdout.should_receive(:puts).with(/Redirected/i).once
+      $stdout.should_receive(:puts).with(/Warning/i).twice
+      $stdout.should_receive(:puts).with(/Redirected/i).twice
       LinkChecker.new(:target => @site_path).check_uris
     end
 
@@ -130,10 +131,11 @@ describe LinkChecker do
   describe "prints output for invalid links and" do
 
     it "declares them to be bad." do
-      LinkChecker.stub(:external_link_uri_strings).and_return(['hQQp://!!!.com'])
+      LinkChecker.stub(:external_link_uri_strings).and_return(
+        ['hQQp://!!!.com', 'hOOp://???.com'])
       $stdout.should_receive(:puts).with(/Problem/i).once
-      $stdout.should_receive(:puts).with(/Link/i).once
-      $stdout.should_receive(:puts).with(/Response/i).once
+      $stdout.should_receive(:puts).with(/Link/i).twice
+      $stdout.should_receive(:puts).with(/Response/i).twice
       thread = LinkChecker.new(:target => @site_path).start_link_check_thread('<html></html>', 'source.html')
       thread.join
     end
