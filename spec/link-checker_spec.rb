@@ -84,7 +84,7 @@ describe LinkChecker do
         LinkChecker::Good.new(:uri_string => 'http://something.com')
       end
       $stdout.should_receive(:puts).with(/Checked/i).once
-      LinkChecker.new(:target => @site_path).check_uris
+      LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
     end
 
     it "prints red when the links are bad." do
@@ -97,7 +97,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Problem/i).once
       $stdout.should_receive(:puts).with(/Link/i).twice
       $stdout.should_receive(:puts).with(/Response/i).twice
-      LinkChecker.new(:target => @site_path).check_uris
+      LinkChecker.new(:target => @site_path).check_uris.should == 1 # Return value: error
     end
 
     it "prints yellow warnings when the links redirect." do
@@ -110,7 +110,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Checked/i).once
       $stdout.should_receive(:puts).with(/Warning/i).twice
       $stdout.should_receive(:puts).with(/Redirected/i).twice
-      LinkChecker.new(:target => @site_path).check_uris
+      LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
     end
 
     it "does not print warnings when the links redirect with the --no-warnings option." do
@@ -123,7 +123,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Checked/i).once
       $stdout.should_receive(:puts).with(/Warning/i).twice
       $stdout.should_receive(:puts).with(/Redirected/i).twice
-      LinkChecker.new(:target => @site_path).check_uris
+      LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
     end
 
   end

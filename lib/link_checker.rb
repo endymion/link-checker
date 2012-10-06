@@ -43,7 +43,6 @@ class LinkChecker
         when Net::HTTPRedirection then
           return self.check_uri(URI(response['location']), true)
         else
-          @return_code = 1
           return Error.new(:uri_string => uri.to_s, :response => response)
         end
       end
@@ -89,6 +88,7 @@ class LinkChecker
         begin
           uri = URI(uri_string)
           response = self.class.check_uri(uri)
+          @return_code = 1 if response.class.eql? Error
           { :uri_string => uri_string, :response => response }
         rescue => error
           { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
