@@ -88,9 +88,10 @@ class LinkChecker
         begin
           uri = URI(uri_string)
           response = self.class.check_uri(uri)
-          { :uri_string => uri_string, :response => response }
+          response.uri_string = uri_string
+          response
         rescue => error
-          { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
+          Error.new(:error => error.to_s, :uri_string => uri_string)
         end
       end
       report_results(source_name, results)
@@ -98,8 +99,8 @@ class LinkChecker
   end
       
   def report_results(file, results)
-    errors = results.select{|result| result[:response].class.eql? Error}
-    warnings = results.select{|result| result[:response].class.eql? Redirect}
+    errors = results.select{|result| result.class.eql? Error}
+    warnings = results.select{|result| result.class.eql? Redirect}
     @return_code = 1 unless errors.empty?
     if @options[:warnings_are_errors]
       @return_code = 1 unless warnings.empty?
@@ -116,19 +117,19 @@ class LinkChecker
         end
         unless @options[:no_warnings]
           warnings.each do |warning|
-            puts "   Warning: #{warning[:uri_string]}".yellow
-            puts "     Redirected to: #{warning[:response].final_destination_uri_string}".yellow
+            puts "   Warning: #{warning.uri_string}".yellow
+            puts "     Redirected to: #{warning.final_destination_uri_string}".yellow
           end
         end
       else
         puts "Problem: #{file}".red
-        errors.each do |check|
-          puts "   Link: #{check[:uri_string]}".red
-          case check[:response]
+        errors.each do |error|
+          puts "   Link: #{error.uri_string}".red
+          case error
           when Redirect
-            puts "     Redirected to: #{check[:response].final_destination_uri_string}".red
+            puts "     Redirected to: #{error.final_destination_uri_string}".red
           when Error
-            puts "     Response: #{check[:response].error.to_s}".red
+            puts "     Response: #{error.error.to_s}".red
           end
         end
       end
@@ -136,7 +137,7 @@ class LinkChecker
   end
 
   class Result
-    attr_reader :uri_string
+    attr_accessor :uri_string
     def initialize(params)
       @uri_string = params[:uri_string]
     end
