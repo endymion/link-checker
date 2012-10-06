@@ -101,6 +101,10 @@ class LinkChecker
   def report_results(file, results)
     bad_checks = results.select{|result| result[:response].class.eql? Error}
     warnings = results.select{|result| result[:response].class.eql? Redirect}
+    if @options[:warnings_are_errors]
+      bad_checks = bad_checks + warnings
+      warnings = []
+    end
     Thread.exclusive do
       if bad_checks.empty?
         message = "Checked: #{file}"
@@ -119,7 +123,12 @@ class LinkChecker
         puts "Problem: #{file}".red
         bad_checks.each do |check|
           puts "   Link: #{check[:uri_string]}".red
-          puts "     Response: #{check[:response].error.to_s}".red
+          case check[:response]
+          when Redirect
+            puts "     Redirected to: #{check[:response].final_destination_uri_string}".red
+          when Error
+            puts "     Response: #{check[:response].error.to_s}".red
+          end
         end
       end
     end

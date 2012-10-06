@@ -113,11 +113,27 @@ describe LinkChecker do
       LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
     end
 
+    it "prints errors when there are warnings with the --warnings_are_errors option." do
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Redirect.new(
+          :uri_string => 'http://something.com',
+          :final_destination_uri_string => 'http://something-else.com'
+        )
+      end
+      $stdout.should_receive(:puts).with(/Problem/i).once
+      $stdout.should_receive(:puts).with(/Link/i).twice
+      $stdout.should_receive(:puts).with(/Redirected/i).twice
+      LinkChecker.new(
+        :target => @site_path,
+        :options => { :warnings_are_errors => true }
+      ).check_uris.should == 0 # Return value: error
+    end
+
     it "does not print warnings when the links redirect with the --no-warnings option." do
       LinkChecker.stub(:check_uri) do
         LinkChecker::Redirect.new(
           :uri_string => 'http://something.com',
-          :final_desination => 'http://something-else.com'
+          :final_destination_uri_string => 'http://something-else.com'
         )
       end
       $stdout.should_receive(:puts).with(/Checked/i).once
