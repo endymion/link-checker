@@ -8,8 +8,10 @@ require 'anemone'
 
 class LinkChecker
 
-  def initialize(target)
-    @target = target
+  def initialize(params)
+    @options = params[:options] || {}
+    @target =  params[:target] || './'
+    @return_code = 0
   end
 
   def html_file_paths
@@ -41,6 +43,7 @@ class LinkChecker
         when Net::HTTPRedirection then
           return self.check_uri(URI(response['location']), true)
         else
+          @return_code = 1
           return Error.new(:uri_string => uri.to_s, :response => response)
         end
       end
@@ -48,11 +51,16 @@ class LinkChecker
   end
 
   def check_uris
-    if @target =~ /^https?\:\/\//
-      check_uris_by_crawling
-    else
-      check_uris_in_files
+    begin
+      if @target =~ /^https?\:\/\//
+        check_uris_by_crawling
+      else
+        check_uris_in_files
+      end
+    rescue => error
+      puts "Error: #{error.to_s}".red
     end
+    @return_code
   end
 
   def check_uris_by_crawling
@@ -60,6 +68,7 @@ class LinkChecker
     Anemone.crawl(@target) do |anemone|
       anemone.storage = Anemone::Storage.PStore('link-checker-crawled-pages.pstore')
       anemone.on_every_page do |crawled_page|
+        raise StandardError.new(crawled_page.error) if crawled_page.error
         threads << start_link_check_thread(crawled_page.body, crawled_page.url.to_s)
       end
     end
@@ -95,14 +104,16 @@ class LinkChecker
     Thread.exclusive do
       if bad_checks.empty?
         message = "Checked: #{file}"
-        if warnings.empty?
+        if warnings.empty? || @options[:no_warnings]
           puts message.green
         else
           puts message.yellow
         end
-        warnings.each do |warning|
-          puts "   Warning: #{warning[:uri_string]}".yellow
-          puts "     Redirected to: #{warning[:response].final_destination_uri_string}".yellow
+        unless @options[:no_warnings]
+          warnings.each do |warning|
+            puts "   Warning: #{warning[:uri_string]}".yellow
+            puts "     Redirected to: #{warning[:response].final_destination_uri_string}".yellow
+          end
         end
       else
         puts "Problem: #{file}".red

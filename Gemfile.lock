@@ -41,6 +41,7 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.5.3)
     simplecov-html (0.5.3)
+    trollop (2.0)
     yard (0.8.2.1)
 
 PLATFORMS
@@ -56,4 +57,5 @@ DEPENDENCIES
   redcarpet (~> 2.1.1)
   rspec (~> 2.11.0)
   simplecov (~> 0.6.4)
+  trollop (~> 2.0)
   yard (~> 0.8.2.1)

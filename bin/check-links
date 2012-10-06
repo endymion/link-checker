@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'link_checker'
+require 'trollop'
 
-# Assume the 'public' directory is the site unless otherwise specified.
-target = ARGV[0] || './'
+options = Trollop::options do
+	opt :no_warnings, "Don't warn about redirects to valid links"
+end
 
-LinkChecker.new(target).check_uris
+exit LinkChecker.new(:options => options, :target => ARGV[0]).check_uris

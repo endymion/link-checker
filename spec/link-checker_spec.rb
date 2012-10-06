@@ -10,7 +10,7 @@ describe LinkChecker do
     end
 
     it "finds all of the HTML files in the target path." do
-      files = LinkChecker.new(@site_path).html_file_paths
+      files = LinkChecker.new(:target => @site_path).html_file_paths
       files.size.should == 3
     end
 
@@ -60,8 +60,8 @@ describe LinkChecker do
       end
 
       it "declares bad redirect targets to be bad." do
-        FakeWeb.register_uri(:get, @redirect_uri.to_s,
-          :location => @bad_uri.to_s, :status => ["302", "Moved"])
+          FakeWeb.register_uri(:get, @redirect_uri.to_s,
+            :location => @bad_uri.to_s, :status => ["302", "Moved"])
         result = LinkChecker.check_uri(@redirect_uri)
         result.class.should be LinkChecker::Error
       end
@@ -83,7 +83,7 @@ describe LinkChecker do
         LinkChecker::Good.new(:uri_string => 'http://something.com')
       end
       $stdout.should_receive(:puts).with(/Checked/i).once
-      LinkChecker.new(@site_path).check_uris
+      LinkChecker.new(:target => @site_path).check_uris
     end
 
     it "prints red when the links are bad." do
@@ -96,7 +96,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Problem/i).once
       $stdout.should_receive(:puts).with(/Link/i).once
       $stdout.should_receive(:puts).with(/Response/i).once
-      LinkChecker.new(@site_path).check_uris
+      LinkChecker.new(:target => @site_path).check_uris
     end
 
     it "prints yellow warnings when the links redirect." do
@@ -109,7 +109,20 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Checked/i).once
       $stdout.should_receive(:puts).with(/Warning/i).once
       $stdout.should_receive(:puts).with(/Redirected/i).once
-      LinkChecker.new(@site_path).check_uris
+      LinkChecker.new(:target => @site_path).check_uris
+    end
+
+    it "does not print warnings when the links redirect with the --no-warnings option." do
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Redirect.new(
+          :uri_string => 'http://something.com',
+          :final_desination => 'http://something-else.com'
+        )
+      end
+      $stdout.should_receive(:puts).with(/Checked/i).once
+      $stdout.should_receive(:puts).with(/Warning/i).once
+      $stdout.should_receive(:puts).with(/Redirected/i).once
+      LinkChecker.new(:target => @site_path).check_uris
     end
 
   end
@@ -121,19 +134,36 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Problem/i).once
       $stdout.should_receive(:puts).with(/Link/i).once
       $stdout.should_receive(:puts).with(/Response/i).once
-      thread = LinkChecker.new(@site_path).start_link_check_thread('<html></html>', 'source.html')
+      thread = LinkChecker.new(:target => @site_path).start_link_check_thread('<html></html>', 'source.html')
       thread.join
     end
 
   end
 
   it "crawls a web site." do
+    FakeWeb.register_uri(:any, 'http://some-target.com', :body => "Yay it worked.")
     LinkChecker.stub(:external_link_uri_strings).and_return(['http://something.com'])
     LinkChecker.stub(:check_uri) do
       LinkChecker::Good.new(:uri_string => 'http://something.com')
     end
     $stdout.should_receive(:puts).with(/Checked/i).once
-    LinkChecker.new('http://pretty-sure-this-is-not-real.com').check_uris
+    LinkChecker.new(:target => 'http://some-target.com').check_uris
+  end
+
+  describe "produces useful return codes when" do
+
+    it "the target file does not exist." do
+      Find.stub(:find).and_raise(Errno::ENOENT.new('test'))
+      $stdout.should_receive(:puts).with(/Error/i).once
+      LinkChecker.new(:target => 'does-not-exist').check_uris
+    end
+
+    it "the target file does not exist." do
+      FakeWeb.allow_net_connect = false
+      $stdout.should_receive(:puts).with(/Error/i).once
+      LinkChecker.new(:target => 'http://does-not-exist.com').check_uris
+    end
+
   end
 
 end
