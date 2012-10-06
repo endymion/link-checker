@@ -126,7 +126,7 @@ describe LinkChecker do
       LinkChecker.new(
         :target => @site_path,
         :options => { :warnings_are_errors => true }
-      ).check_uris.should == 0 # Return value: error
+      ).check_uris.should == 1 # Return value: error
     end
 
     it "does not print warnings when the links redirect with the --no-warnings option." do

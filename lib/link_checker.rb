@@ -88,7 +88,6 @@ class LinkChecker
         begin
           uri = URI(uri_string)
           response = self.class.check_uri(uri)
-          @return_code = 1 if response.class.eql? Error
           { :uri_string => uri_string, :response => response }
         rescue => error
           { :uri_string => uri_string, :response => Error.new(:error => error.to_s) }
@@ -99,14 +98,16 @@ class LinkChecker
   end
       
   def report_results(file, results)
-    bad_checks = results.select{|result| result[:response].class.eql? Error}
+    errors = results.select{|result| result[:response].class.eql? Error}
     warnings = results.select{|result| result[:response].class.eql? Redirect}
+    @return_code = 1 unless errors.empty?
     if @options[:warnings_are_errors]
-      bad_checks = bad_checks + warnings
+      @return_code = 1 unless warnings.empty?
+      errors = errors + warnings
       warnings = []
     end
     Thread.exclusive do
-      if bad_checks.empty?
+      if errors.empty?
         message = "Checked: #{file}"
         if warnings.empty? || @options[:no_warnings]
           puts message.green
@@ -121,7 +122,7 @@ class LinkChecker
         end
       else
         puts "Problem: #{file}".red
-        bad_checks.each do |check|
+        errors.each do |check|
           puts "   Link: #{check[:uri_string]}".red
           case check[:response]
           when Redirect
