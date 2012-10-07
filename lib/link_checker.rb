@@ -11,6 +11,11 @@ class LinkChecker
   def initialize(params)
     @options = params[:options] || {}
     @target =  params[:target] || './'
+
+    @html_files = []
+    @links = []
+    @errors = []
+    @warnings = []
     @return_code = 0
   end
 
@@ -59,6 +64,21 @@ class LinkChecker
     rescue => error
       puts "Error: #{error.to_s}".red
     end
+
+    # Report the final results.
+    unless @html_files.empty?
+      file_pluralized = (@html_files.size.eql? 1) ? 'file' : 'files'
+      link_pluralized = (@links.size.eql? 1) ? 'link' : 'links'
+      if @errors.empty?
+        puts ("Checked #{@links.size} #{link_pluralized} in #{@html_files.size} " +
+          "HTML #{file_pluralized} and found no errors.").green
+      else
+        error_pluralized = (@errors.size.eql? 1) ? 'error' : 'errors'
+        puts ("Checked #{@links.size} #{link_pluralized} in #{@html_files.size} " +
+          "HTML #{file_pluralized} and found #{@errors.size} #{error_pluralized}.").red
+      end
+    end
+
     @return_code
   end
 
@@ -69,6 +89,7 @@ class LinkChecker
       anemone.on_every_page do |crawled_page|
         raise StandardError.new(crawled_page.error) if crawled_page.error
         threads << start_link_check_thread(crawled_page.body, crawled_page.url.to_s)
+        @html_files << crawled_page
       end
     end
     threads.each{|thread| thread.join }
@@ -78,6 +99,7 @@ class LinkChecker
     threads = []
     html_file_paths.each do |file|
       threads << start_link_check_thread(open(file), file)
+      @html_files << file
     end
     threads.each{|thread| thread.join }
   end
@@ -85,6 +107,7 @@ class LinkChecker
   def start_link_check_thread(source, source_name)
     Thread.new do
       results = self.class.external_link_uri_strings(source).map do |uri_string|
+        Thread.exclusive { @links << source }
         begin
           uri = URI(uri_string)
           response = self.class.check_uri(uri)
@@ -108,6 +131,11 @@ class LinkChecker
       warnings = []
     end
     Thread.exclusive do
+      # Store the results in the LinkChecker instance.
+      # This must be thread-exclusive to avoid a race condition.
+      @errors = @errors.concat(errors)
+      @warnings = @warnings.concat(warnings)
+
       if errors.empty?
         message = "Checked: #{file}"
         if warnings.empty? || @options[:no_warnings]

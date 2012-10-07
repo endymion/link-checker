@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://yoursite.com/atom.xml" rel="self"/>
   <link href="http://yoursite.com/"/>
-  <updated>2012-10-02T22:10:18-04:00</updated>
+  <updated>2012-10-07T13:09:13-04:00</updated>
   <id>http://yoursite.com/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -14,13 +14,22 @@
 
   
   <entry>
-    <title type="html"><![CDATA[A list of links]]></title>
-    <link href="http://yoursite.com/blog/2012/10/02/a-list-of-links/"/>
-    <updated>2012-10-02T14:44:00-04:00</updated>
-    <id>http://yoursite.com/blog/2012/10/02/a-list-of-links</id>
+    <title type="html"><![CDATA[Some good links]]></title>
+    <link href="http://yoursite.com/blog/2012/10/07/some-good-links/"/>
+    <updated>2012-10-07T00:00:00-04:00</updated>
+    <id>http://yoursite.com/blog/2012/10/07/some-good-links</id>
     <content type="html"><![CDATA[<p><a href="http://goodlink.com">A good link</a></p>
 
-<p><a href="http://brokenlink.com">A broken link</a></p>
+<p><a href="http://anothergoodlink.com">Another good link</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Some good links]]></title>
+    <link href="http://yoursite.com/blog/2012/10/07/a-bad-link/"/>
+    <updated>2012-10-07T00:00:00-04:00</updated>
+    <id>http://yoursite.com/blog/2012/10/07/a-bad-link</id>
+    <content type="html"><![CDATA[<p><a href="http://badlink.com">A bad link</a></p>
 ]]></content>
   </entry>
   
