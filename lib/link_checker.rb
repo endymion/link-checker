@@ -160,6 +160,7 @@ class LinkChecker
     attr_reader :error
     def initialize(params)
       @error = params[:error]
+      super(params)
     end
   end
 
