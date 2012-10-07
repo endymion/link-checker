@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "link-checker"
-  s.version = "0.5.0"
+  s.version = "0.5.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Alyn Porter"]
-  s.date = "2012-10-06"
+  s.date = "2012-10-07"
   s.description = "Check the links in a web site before deploying, using Nokogiri."
   s.executables = ["check-links"]
   s.extra_rdoc_files = [
