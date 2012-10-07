@@ -76,16 +76,21 @@ describe LinkChecker do
       LinkChecker.any_instance.stub(:html_file_paths) {
         ['spec/test-site/public/blog/2012/10/07/some-good-links/index.html'] }
       LinkChecker.stub(:external_link_uri_strings).and_return(
-        ['http://something.com', 'http://something-else.com'])
+        (1..20).map{|i| "http://something-#{i}.com" } )
     end
 
     it "prints green when the links are good." do
       LinkChecker.stub(:check_uri) do
+        sleep 0.5 # Make LinkChecker#wait_to_spawn_thread wait a little.
         LinkChecker::Good.new(:uri_string => 'http://something.com')
       end
       $stdout.should_receive(:puts).with(/Checked\: .*\.html/).once
-      $stdout.should_receive(:puts).with(/Checked 2 links in 1 HTML file and found no errors/)
-      LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
+      $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found no errors/)
+      LinkChecker.new(
+        :target => @site_path,
+        # This is to make sure that the entire LinkChecker#wait_to_spawn_thread gets hit during testing.
+        :options => { :max_threads => 1 }
+      ).check_uris.should == 0 # Return value: good
     end
 
     it "prints red when the links are bad." do
@@ -96,9 +101,9 @@ describe LinkChecker do
         )
       end
       $stdout.should_receive(:puts).with(/Problem\: .*\.html/).once
-      $stdout.should_receive(:puts).with(/Link\: http/).twice
-      $stdout.should_receive(:puts).with(/Response/).twice
-      $stdout.should_receive(:puts).with(/Checked 2 links in 1 HTML file and found 2 errors/)
+      $stdout.should_receive(:puts).with(/Link\: http/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Response/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found 20 errors/)
       LinkChecker.new(:target => @site_path).check_uris.should == 1 # Return value: error
     end
 
@@ -110,9 +115,9 @@ describe LinkChecker do
         )
       end
       $stdout.should_receive(:puts).with(/Checked\: .*\.html/).once
-      $stdout.should_receive(:puts).with(/Warning/).twice
-      $stdout.should_receive(:puts).with(/Redirected/).twice
-      $stdout.should_receive(:puts).with(/Checked 2 links in 1 HTML file and found no errors/)
+      $stdout.should_receive(:puts).with(/Warning/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Redirected/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found no errors/)
       LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
     end
 
@@ -124,9 +129,9 @@ describe LinkChecker do
         )
       end
       $stdout.should_receive(:puts).with(/Problem\: .*\.html/).once
-      $stdout.should_receive(:puts).with(/Link/).twice
-      $stdout.should_receive(:puts).with(/Redirected/).twice
-      $stdout.should_receive(:puts).with(/Checked 2 links in 1 HTML file and found 2 errors/)
+      $stdout.should_receive(:puts).with(/Link/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Redirected/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found 20 errors/)
       LinkChecker.new(
         :target => @site_path,
         :options => { :warnings_are_errors => true }
@@ -141,9 +146,9 @@ describe LinkChecker do
         )
       end
       $stdout.should_receive(:puts).with(/Checked\: .*\.html/).once
-      $stdout.should_receive(:puts).with(/Warning/).twice
-      $stdout.should_receive(:puts).with(/Redirected/).twice
-      $stdout.should_receive(:puts).with(/Checked 2 links in 1 HTML file and found no errors/)
+      $stdout.should_receive(:puts).with(/Warning/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Redirected/).exactly(20).times
+      $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found no errors/)
       LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
     end
 

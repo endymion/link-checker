@@ -9,7 +9,7 @@ require 'anemone'
 class LinkChecker
 
   def initialize(params)
-    @options = params[:options] || {}
+    @options = params[:options] || { }
     @target =  params[:target] || './'
 
     @html_files = []
@@ -17,6 +17,8 @@ class LinkChecker
     @errors = []
     @warnings = []
     @return_code = 0
+
+    @options[:max_threads] ||= 100 # Only happens in testing.
   end
 
   def html_file_paths
@@ -48,7 +50,7 @@ class LinkChecker
         when Net::HTTPRedirection then
           return self.check_uri(URI(response['location']), true)
         else
-          return Error.new(:uri_string => uri.to_s, :response => response)
+          return Error.new(:uri_string => uri.to_s, :error => response)
         end
       end
     end
@@ -98,6 +100,7 @@ class LinkChecker
   def check_uris_in_files
     threads = []
     html_file_paths.each do |file|
+      wait_to_spawn_thread
       threads << start_link_check_thread(open(file), file)
       @html_files << file
     end
@@ -106,17 +109,24 @@ class LinkChecker
 
   def start_link_check_thread(source, source_name)
     Thread.new do
-      results = self.class.external_link_uri_strings(source).map do |uri_string|
+      threads = []
+      results = []
+      self.class.external_link_uri_strings(source).each do |uri_string|
         Thread.exclusive { @links << source }
-        begin
-          uri = URI(uri_string)
-          response = self.class.check_uri(uri)
-          response.uri_string = uri_string
-          response
-        rescue => error
-          Error.new(:error => error.to_s, :uri_string => uri_string)
+        wait_to_spawn_thread
+        threads << Thread.new do
+          begin
+            uri = URI(uri_string)
+            response = self.class.check_uri(uri)
+            response.uri_string = uri_string
+            Thread.exclusive { results << response }
+          rescue => error
+            Thread.exclusive { results <<
+              Error.new(:error => error.to_s, :uri_string => uri_string) }
+          end
         end
       end
+      threads.each {|thread| thread.join }
       report_results(source_name, results)
     end
   end
@@ -189,6 +199,17 @@ class LinkChecker
     def initialize(params)
       @error = params[:error]
       super(params)
+    end
+  end
+
+  private
+
+  def wait_to_spawn_thread
+    # Never spawn more than the specified maximum number of threads.
+    until Thread.list.select {|thread| thread.status == "run"}.count <
+      (1 + @options[:max_threads]) do
+      # Wait 5 milliseconds before trying again.
+      sleep 0.005
     end
   end
 
