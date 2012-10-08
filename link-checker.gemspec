@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "link-checker"
-  s.version = "0.5.2"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Alyn Porter"]
-  s.date = "2012-10-07"
+  s.date = "2012-10-08"
   s.description = "Check the links in a web site before deploying, using Nokogiri."
   s.executables = ["check-links"]
   s.extra_rdoc_files = [
@@ -221,7 +221,8 @@ Gem::Specification.new do |s|
     "spec/test-site/public/assets/jwplayer/glow/sharing/shareScreen.png",
     "spec/test-site/public/assets/jwplayer/player.swf",
     "spec/test-site/public/atom.xml",
-    "spec/test-site/public/blog/2012/10/02/a-list-of-links/index.html",
+    "spec/test-site/public/blog/2012/10/07/a-bad-link/index.html",
+    "spec/test-site/public/blog/2012/10/07/some-good-links/index.html",
     "spec/test-site/public/blog/archives/index.html",
     "spec/test-site/public/favicon.png",
     "spec/test-site/public/images/bird_32_gray.png",
@@ -304,7 +305,8 @@ Gem::Specification.new do |s|
     "spec/test-site/source/_layouts/default.html",
     "spec/test-site/source/_layouts/page.html",
     "spec/test-site/source/_layouts/post.html",
-    "spec/test-site/source/_posts/2012-10-02-a-list-of-links.markdown",
+    "spec/test-site/source/_posts/2012-10-07-a-bad-link.markdown",
+    "spec/test-site/source/_posts/2012-10-07-some-good-links.markdown",
     "spec/test-site/source/assets/jwplayer/glow/controlbar/background.png",
     "spec/test-site/source/assets/jwplayer/glow/controlbar/blankButton.png",
     "spec/test-site/source/assets/jwplayer/glow/controlbar/divider.png",
