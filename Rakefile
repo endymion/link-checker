@@ -18,7 +18,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "https://github.com/endymion/link-checker"
   gem.license = "MIT"
   gem.summary = %Q{Check the links in a web site before deploying.}
-  gem.description = %Q{Check the links in a web site before deploying, using Nokogiri.}
+  gem.description = %Q{A Ruby gem for checking the links in a web site. Can either scan files or crawl pages. Multi-threaded, with red/green colored output, support for SSL, and support for following redirects. Works great with Octopress, Jekyll, or any collection of static HTML files. With 100% RSpec coverage.}
   gem.authors = ["Ryan Alyn Porter"]
   # dependencies defined in Gemfile
 end
