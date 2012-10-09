@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = "link-checker"
-  s.version = "0.7.1"
+  s.version = "0.7.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Alyn Porter"]
   s.date = "2012-10-09"
-  s.description = "Check the links in a web site before deploying, using Nokogiri."
+  s.description = "A Ruby gem for checking the links in a web site. Can either scan files or crawl pages. Multi-threaded, with red/green colored output, support for SSL, and support for following redirects. Works great with Octopress, Jekyll, or any collection of static HTML files. With 100% RSpec coverage."
   s.executables = ["check-links"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
@@ -370,7 +370,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://www.ryanalynporter.com/2012/10/06/introducing-the-link-checker-ruby-gem/"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.24"
+  s.rubygems_version = "1.8.15"
   s.summary = "Check the links in a web site before deploying."
 
   if s.respond_to? :specification_version then
