@@ -162,7 +162,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Problem\: .*\.html/).once
       $stdout.should_receive(:puts).with(/Link/).twice
       $stdout.should_receive(:puts).with(/Response/).twice
-      thread = LinkChecker.new(:target => @site_path).start_link_check_thread('<html></html>', 'source.html')
+      thread = LinkChecker.new(:target => @site_path).check_page('<html></html>', 'source.html')
       thread.join
     end
 

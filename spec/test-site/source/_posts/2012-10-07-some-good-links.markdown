@@ -6,6 +6,6 @@ comments: true
 categories: 
 ---
 
-[A good link](http://goodlink.com)
+[A good link](http://cnn.com)
 
-[Another good link](http://anothergoodlink.com)
+[Another good link](http://google.com)

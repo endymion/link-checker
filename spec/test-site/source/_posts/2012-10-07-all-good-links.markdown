@@ -6,4 +6,4 @@ comments: true
 categories: 
 ---
 
-[A bad link](http://badlink.com)
+[A bad link](http://cnn.com)
