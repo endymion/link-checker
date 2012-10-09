@@ -15,7 +15,7 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "link-checker"
-  gem.homepage = "https://github.com/endymion/link-checker"
+  gem.homepage = "http://www.ryanalynporter.com/2012/10/06/introducing-the-link-checker-ruby-gem/"
   gem.license = "MIT"
   gem.summary = %Q{Check the links in a web site before deploying.}
   gem.description = %Q{A Ruby gem for checking the links in a web site. Can either scan files or crawl pages. Multi-threaded, with red/green colored output, support for SSL, and support for following redirects. Works great with Octopress, Jekyll, or any collection of static HTML files. With 100% RSpec coverage.}
