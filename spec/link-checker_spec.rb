@@ -39,6 +39,9 @@ describe LinkChecker do
         :body => "File not found", :status => ["404", "Missing"])
 
       @redirect_uri = URI('http://redirect.com')
+ 
+      @auc_uri = URI('http://www.auc.edu.au/devworld')
+      @auc_uri_good = URI('http://auc.edu.au/devworld/about/')
     end
 
     it "declares good links to be good." do
@@ -66,6 +69,15 @@ describe LinkChecker do
         result.class.should be LinkChecker::Error
       end
 
+    end
+
+    describe "follow redirects for http://www.auc.edu.au/devworld and" do
+
+      it "declares the final target to be good." do
+        result = LinkChecker.check_uri(@auc_uri)
+        result.class.should be LinkChecker::Redirect
+        result.final_destination_uri_string.should == @auc_uri_good.to_s
+      end
     end
 
   end
