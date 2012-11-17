@@ -42,6 +42,7 @@ describe LinkChecker do
 
       @relative_redirect_1 = URI('http://www.relative.com/somewhere')
       @relative_redirect_2 = URI('http://relative.com/somewhere')
+      @relative_redirect_location = '/somewhere/else/'
       @relative_redirect_3 = URI('http://relative.com/somewhere/else/')
     end
 
@@ -78,7 +79,7 @@ describe LinkChecker do
 	FakeWeb.register_uri(:get, @relative_redirect_1.to_s,
           :location => @relative_redirect_2.to_s, :status => ["302", "Moved"])	
 	FakeWeb.register_uri(:get, @relative_redirect_2.to_s,
-	  :location => '/somewhere/else/', :status => ["302", "Moved"])
+	  :location => @relative_redirect_location, :status => ["302", "Moved"])
 	FakeWeb.register_uri(:get, @relative_redirect_3.to_s,
           :body => "Yay, it worked!")
         result = LinkChecker.check_uri(@relative_redirect_1)
