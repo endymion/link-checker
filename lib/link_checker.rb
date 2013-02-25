@@ -24,7 +24,7 @@ class LinkChecker
     @warnings = []
     @return_code = 0
 
-    @options[:max_threads] ||= 100
+    @options[:max_threads] ||= 4
   end
 
   # Find a list of HTML files in the @target path, which was set in the {#initialize} method.
@@ -64,15 +64,15 @@ class LinkChecker
             return Good.new(:uri_string => uri.to_s)
           end
         when Net::HTTPRedirection then
-          # If the redirect is relative we need to build a new uri
-          # using the current uri as a base.  This isn't perfect.
-          if response['location'].match(/^http/) 
-            new_uri = URI(response['location'])
-          else
-            new_uri = URI.join("#{uri.scheme}://#{uri.host}:#{uri.port}", response['location'])
-          end
-          
-          return self.check_uri(new_uri, true)
+          uri =
+            if response['location'].match(/\:\/\//) # Allows for https://
+              URI(response['location'])
+            else
+              # If the redirect is relative we need to build a new uri
+              # using the current uri as a base.
+              URI.join("#{uri.scheme}://#{uri.host}:#{uri.port}", response['location'])
+            end          
+          return self.check_uri(uri, true)
         else
           return Error.new(:uri_string => uri.to_s, :error => response)
         end
