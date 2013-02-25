@@ -39,6 +39,11 @@ describe LinkChecker do
         :body => "File not found", :status => ["404", "Missing"])
 
       @redirect_uri = URI('http://redirect.com')
+
+      @relative_redirect_1 = URI('http://www.relative.com/somewhere')
+      @relative_redirect_2 = URI('http://relative.com/somewhere')
+      @relative_redirect_location = '/somewhere/else/'
+      @relative_redirect_3 = URI('http://relative.com/somewhere/else/')
     end
 
     it "declares good links to be good." do
@@ -66,6 +71,21 @@ describe LinkChecker do
         result.class.should be LinkChecker::Error
       end
 
+    end
+
+    describe "follow relative redirects for and" do
+
+      it "declares the final target to be good." do
+	FakeWeb.register_uri(:get, @relative_redirect_1.to_s,
+          :location => @relative_redirect_2.to_s, :status => ["302", "Moved"])	
+	FakeWeb.register_uri(:get, @relative_redirect_2.to_s,
+	  :location => @relative_redirect_location, :status => ["302", "Moved"])
+	FakeWeb.register_uri(:get, @relative_redirect_3.to_s,
+          :body => "Yay, it worked!")
+        result = LinkChecker.check_uri(@relative_redirect_1)
+        result.class.should be LinkChecker::Redirect
+        result.final_destination_uri_string.should == @relative_redirect_3.to_s
+      end
     end
 
   end

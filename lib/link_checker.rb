@@ -64,7 +64,15 @@ class LinkChecker
             return Good.new(:uri_string => uri.to_s)
           end
         when Net::HTTPRedirection then
-          return self.check_uri(URI(response['location']), true)
+          # If the redirect is relative we need to build a new uri
+          # using the current uri as a base.  This isn't perfect.
+          if response['location'].match(/^http/) 
+            new_uri = URI(response['location'])
+          else
+            new_uri = URI.join("#{uri.scheme}://#{uri.host}:#{uri.port}", response['location'])
+          end
+          
+          return self.check_uri(new_uri, true)
         else
           return Error.new(:uri_string => uri.to_s, :error => response)
         end
