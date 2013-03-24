@@ -40,9 +40,9 @@ class LinkChecker
   # @return [Array] A list of URI strings.
   def self.external_link_uri_strings(source)
     Nokogiri::HTML(source).css('a').select {|link|
-        !link.attribute('href').nil? &&
+        link.attribute('href') &&
         link.attribute('href').value =~ /^https?\:\/\//
-    }.map{|link| link.attributes['href'].value }
+    }.map{|link| link['href'] }
   end
 
   # Check one URL.
@@ -98,13 +98,12 @@ class LinkChecker
     unless @html_files.empty?
       file_pluralized = (@html_files.size.eql? 1) ? 'file' : 'files'
       link_pluralized = (@links.size.eql? 1) ? 'link' : 'links'
+      summary = "Checked #{@links.size} #{link_pluralized} in #{@html_files.size}"
       if @errors.empty?
-        puts ("Checked #{@links.size} #{link_pluralized} in #{@html_files.size} " +
-          "HTML #{file_pluralized} and found no errors.").green
+        puts ("#{summary} HTML #{file_pluralized} and found no errors.").green
       else
         error_pluralized = (@errors.size.eql? 1) ? 'error' : 'errors'
-        puts ("Checked #{@links.size} #{link_pluralized} in #{@html_files.size} " +
-          "HTML #{file_pluralized} and found #{@errors.size} #{error_pluralized}.").red
+        puts ("#{summary} HTML #{file_pluralized} and found #{@errors.size} #{error_pluralized}.").red
       end
     end
 
@@ -141,8 +140,8 @@ class LinkChecker
   # Spawn a thread to check an HTML page, and then spawn a thread for checking each
   # link within that page.
   #
-  # @param source [String] The contents of the HTML page, as a string.
-  # @param source_name [String] The name of the source, which will be reported if
+  # @param page [String] The contents of the HTML page, as a string.
+  # @param page_name [String] The name of the source, which will be reported if
   # there is an error or a warning.
   def check_page(page, page_name)
     Thread.new do
