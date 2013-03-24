@@ -97,13 +97,12 @@ class LinkChecker
     unless @html_files.empty?
       file_pluralized = (@html_files.size.eql? 1) ? 'file' : 'files'
       link_pluralized = (@links.size.eql? 1) ? 'link' : 'links'
+      summary = "Checked #{@links.size} #{link_pluralized} in #{@html_files.size}"
       if @errors.empty?
-        puts ("Checked #{@links.size} #{link_pluralized} in #{@html_files.size} " +
-          "HTML #{file_pluralized} and found no errors.").green
+        puts ("#{summary} HTML #{file_pluralized} and found no errors.").green
       else
         error_pluralized = (@errors.size.eql? 1) ? 'error' : 'errors'
-        puts ("Checked #{@links.size} #{link_pluralized} in #{@html_files.size} " +
-          "HTML #{file_pluralized} and found #{@errors.size} #{error_pluralized}.").red
+        puts ("#{summary} HTML #{file_pluralized} and found #{@errors.size} #{error_pluralized}.").red
       end
     end
 
