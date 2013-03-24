@@ -40,7 +40,7 @@ class LinkChecker
   # @return [Array] A list of URI strings.
   def self.external_link_uri_strings(source)
     Nokogiri::HTML(source).css('a').select {|link|
-        !link.attribute('href').nil? &&
+        link.attribute('href') &&
         link.attribute('href').value =~ /^https?\:\/\//
     }.map{|link| link.attributes['href'].value }
   end
