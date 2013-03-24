@@ -139,8 +139,8 @@ class LinkChecker
   # Spawn a thread to check an HTML page, and then spawn a thread for checking each
   # link within that page.
   #
-  # @param source [String] The contents of the HTML page, as a string.
-  # @param source_name [String] The name of the source, which will be reported if
+  # @param page [String] The contents of the HTML page, as a string.
+  # @param page_name [String] The name of the source, which will be reported if
   # there is an error or a warning.
   def check_page(page, page_name)
     Thread.new do
