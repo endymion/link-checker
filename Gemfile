@@ -1,4 +1,4 @@
-source :rubygems
+source 'https://rubygems.org'
 
 gem "nokogiri", "~> 1.5.5"
 gem "colorize", "~> 0.5.8"
