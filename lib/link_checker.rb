@@ -122,7 +122,7 @@ class LinkChecker
       wait_to_spawn_thread
       uri_string = url.send(url_attribute)
       threads << check_uri(uri_string) {|response|
-        yield url, response if block_given?
+        Thread.exclusive { yield url, response if block_given? }
       }
       @html_files << uri_string
     end
