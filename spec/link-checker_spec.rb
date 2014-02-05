@@ -115,6 +115,67 @@ describe LinkChecker do
 
   end
 
+  describe "url processing from activerecord" do
+
+    it "retrieves url from activerecord" do
+      url_attribute = 'url'
+
+      url_record = double('url_record')
+      url_record.should_receive(url_attribute).and_return('http://www.example.com')
+
+      url_records_query = double('url_records_query')
+      url_records_query.should_receive(:each).and_yield(url_record)
+
+      check_uri = double('check_uri')
+      check_uri.should_receive(:join)
+      LinkChecker.any_instance.should_receive(:check_uri).and_return(check_uri)
+
+      LinkChecker.new(:options => {}).check_uris_from_activerecord(url_records_query, url_attribute)
+    end
+
+    it "processes the url if no block given" do
+      url_attribute = 'url'
+
+      url_record = double('url_record')
+      url_record.should_receive(url_attribute).and_return('http://www.example.com')
+
+      url_records_query = double('url_records_query')
+      url_records_query.should_receive(:each).and_yield(url_record)
+
+      FakeWeb.register_uri(:any, 'http://example.com', :body => "Yay it worked.")
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Good.new(:uri_string => 'http://something.com')
+      end
+      $stdout.should_receive(:puts).with(/Checked\: http/).once
+
+      LinkChecker.new(:options => {}).check_uris_from_activerecord(url_records_query, url_attribute)
+    end
+
+    it "calls the block if provided with the results of the uri check" do
+      url_attribute = 'url'
+
+      url_record = double('url_record')
+      url_record.should_receive(url_attribute).and_return('http://www.example.com')
+
+      url_records_query = double('url_records_query')
+      url_records_query.should_receive(:each).and_yield(url_record)
+
+      FakeWeb.register_uri(:any, 'http://example.com', :body => "Yay it worked.")
+      
+      expected_link_status = LinkChecker::Good.new(:uri_string => 'http://something.com')
+      LinkChecker.stub(:check_uri) do
+        expected_link_status
+      end
+      $stdout.should_receive(:puts).with(/Checked\: http/).once
+
+      LinkChecker.new(:options => {}).check_uris_from_activerecord(url_records_query, url_attribute) { |url, response|
+        url.should == url_record
+        response.should == expected_link_status
+      }
+    end
+
+  end
+
   describe "scans a file path and prints output" do
 
     before(:each) do

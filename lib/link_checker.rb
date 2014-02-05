@@ -113,6 +113,22 @@ class LinkChecker
     @return_code
   end
 
+  # Spawn a thread for each page retrieved from activerecord
+  # print out results once found.
+  def check_uris_from_activerecord(urls, url_attribute='url')
+    threads = []
+    results = []
+    urls.each do |url|
+      wait_to_spawn_thread
+      uri_string = url.send(url_attribute)
+      threads << check_uri(uri_string) {|response|
+        yield url, response if block_given?
+      }
+      @html_files << uri_string
+    end
+    threads.each { |thread| thread.join }
+  end
+
   # Spawn a thread (up to max_threads) to check each page in the array
   # print out the results once found
   def check_uris_from_file(filename)
@@ -167,6 +183,7 @@ class LinkChecker
         uri = URI(uri_string)
         response = self.class.check_uri(uri)
         response.uri_string = uri_string
+        yield response if block_given?
         Thread.exclusive { results << response }
       rescue => error
         Thread.exclusive { results <<
