@@ -85,7 +85,9 @@ class LinkChecker
   # a file path.
   def check_uris
     begin
-      if @target =~ /^https?\:\/\//
+      if ! @options[:filename].nil?
+        check_uris_from_file(@options[:filename])
+      elsif @target =~ /^https?\:\/\//
         check_uris_by_crawling
       else
         check_uris_in_files
@@ -109,6 +111,21 @@ class LinkChecker
     end
 
     @return_code
+  end
+
+  # Spawn a thread (up to max_threads) to check each page in the array
+  # print out the results once found
+  def check_uris_from_file(filename)
+    threads = []
+    f = File.open(filename, "r")
+    f.each_line do |line|
+      wait_to_spawn_thread
+      uri_string = line.strip
+      threads << check_uri(uri_string)
+      @html_files << uri_string
+    end
+    f.close
+    threads.each { |thread| thread.join }
   end
 
   # Use {http://anemone.rubyforge.org Anemone} to crawl the pages at the @target URL,
@@ -136,6 +153,27 @@ class LinkChecker
       @html_files << file
     end
     threads.each{|thread| thread.join }
+  end
+
+
+  # Spawn a thread to check a single HTML page
+  #
+  # @param uri_string [String] The uri of the page to check.
+  def check_uri(uri_string)
+    Thread.new do
+      results = []
+      begin
+        Thread.exclusive { @links << uri_string }
+        uri = URI(uri_string)
+        response = self.class.check_uri(uri)
+        response.uri_string = uri_string
+        Thread.exclusive { results << response }
+      rescue => error
+        Thread.exclusive { results <<
+          Error.new( :error => error.to_s, :uri_string => uri_string) }
+      end
+      report_results(uri_string, results)
+    end
   end
 
   # Spawn a thread to check an HTML page, and then spawn a thread for checking each
@@ -189,7 +227,7 @@ class LinkChecker
 
       if errors.empty?
         message = "Checked: #{page_name}"
-        if warnings.empty? || @options[:no_warnings]
+        if @options[:no_warnings] || warnings.empty?
           puts message.green
         else
           puts message.yellow

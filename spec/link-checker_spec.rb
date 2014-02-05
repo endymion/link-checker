@@ -89,6 +89,32 @@ describe LinkChecker do
 
   end
 
+  describe "url file processing" do
+
+    it "calls the correct function if filename parameter is passed in." do
+      LinkChecker.any_instance.should_receive(:check_uris_from_file).with('whatever.txt')
+      LinkChecker.new(:options => { :filename => 'whatever.txt' }).check_uris
+    end
+
+    it "validates links located in file" do
+      File.should_receive(:open).with('whatever.txt','r') do
+        link_file = double('link_file')
+        link_file.should_receive(:each_line).and_yield("http://some-target.com\n")
+        link_file.should_receive(:close)
+        link_file
+      end
+
+      FakeWeb.register_uri(:any, 'http://some-target.com', :body => "Yay it worked.")
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Good.new(:uri_string => 'http://something.com')
+      end
+      $stdout.should_receive(:puts).with(/Checked\: http/).once
+      $stdout.should_receive(:puts).with(/Checked 1 link in 1 HTML file and found no errors/)
+      LinkChecker.new(:options => { :filename => 'whatever.txt' }).check_uris
+    end
+
+  end
+
   describe "scans a file path and prints output" do
 
     before(:each) do

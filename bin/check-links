@@ -7,6 +7,7 @@ options = Trollop::options do
 	opt :no_warnings, "Don't warn about redirects to valid links"
 	opt :warnings_are_errors, "Treat any warning as an error and produce an error return code"
 	opt :max_threads, "The maximum number of threads to start.", :default => 100
+	opt :filename, "File containing urls to check, one per line.", :type => :string
 end
 
 exit LinkChecker.new(:options => options, :target => ARGV[0]).check_uris
