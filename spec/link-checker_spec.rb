@@ -49,6 +49,13 @@ describe LinkChecker do
       LinkChecker.check_uri(@bad_uri).class.should be LinkChecker::Error
     end
 
+    it 'declares malformed links to be bad' do
+      # Example: http://www.yakimacounty.us/assessor/assessor.htm redirects to %2fassessor%2fDefault.aspx%3fAspxAutoDetectCookieSupport%3d1
+      # which causes everything to crash
+      malformed_uri = URI('%2fassessor%2fDefault.aspx%3fAspxAutoDetectCookieSupport%3d1')
+      LinkChecker.check_uri(malformed_uri).class.should be LinkChecker::Error
+    end
+
     describe "follows redirects to the destination and" do
 
       it "declares good redirect targets to be good." do

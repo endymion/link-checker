@@ -53,6 +53,7 @@ class LinkChecker
   def self.check_uri(uri, redirected=false)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.scheme == "https"
+    begin
     http.start do
       path = (uri.path.empty?) ? '/' : uri.path
       http.request_get(path) do |response|
@@ -77,6 +78,9 @@ class LinkChecker
           return Error.new(:uri_string => uri.to_s, :error => response)
         end
       end
+    end
+    rescue => error
+      Error.new(:uri_string => uri.to_s, :error => error)
     end
   end
 
@@ -122,7 +126,7 @@ class LinkChecker
       wait_to_spawn_thread
       uri_string = url.send(url_attribute)
       threads << check_uri(uri_string) {|response|
-        Thread.exclusive { yield url, response if block_given? }
+        yield url,response if block_given?
       }
       @html_files << uri_string
     end
