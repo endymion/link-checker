@@ -36,9 +36,19 @@ To check the links for a Jekyll site:
 
     check-links
 
+To check the links based on the contents of a file:
+
+    check-links --filename 'my_list_of_urls.txt'
+
 To crawl a live web site:
 
 	check-links 'http://your-site.com'
+
+You can also use this library to check the links from a database:
+
+    LinkChecker.new(:options => {}).check_uris_from_activerecord(url_records_query, url_attribute) { |url, response|
+        # ... code to handle the response ...
+    }
 
 ## Return value
 

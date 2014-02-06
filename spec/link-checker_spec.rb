@@ -49,6 +49,13 @@ describe LinkChecker do
       LinkChecker.check_uri(@bad_uri).class.should be LinkChecker::Error
     end
 
+    it 'declares malformed links to be bad' do
+      # Example: http://www.yakimacounty.us/assessor/assessor.htm redirects to %2fassessor%2fDefault.aspx%3fAspxAutoDetectCookieSupport%3d1
+      # which causes everything to crash
+      malformed_uri = URI('%2fassessor%2fDefault.aspx%3fAspxAutoDetectCookieSupport%3d1')
+      LinkChecker.check_uri(malformed_uri).class.should be LinkChecker::Error
+    end
+
     describe "follows redirects to the destination and" do
 
       it "declares good redirect targets to be good." do
@@ -85,6 +92,93 @@ describe LinkChecker do
         result.class.should be LinkChecker::Redirect
         result.final_destination_uri_string.should == destination.to_s
       end
+    end
+
+  end
+
+  describe "url file processing" do
+
+    it "calls the correct function if filename parameter is passed in." do
+      LinkChecker.any_instance.should_receive(:check_uris_from_file).with('whatever.txt')
+      LinkChecker.new(:options => { :filename => 'whatever.txt' }).check_uris
+    end
+
+    it "validates links located in file" do
+      File.should_receive(:open).with('whatever.txt','r') do
+        link_file = double('link_file')
+        link_file.should_receive(:each_line).and_yield("http://some-target.com\n")
+        link_file.should_receive(:close)
+        link_file
+      end
+
+      FakeWeb.register_uri(:any, 'http://some-target.com', :body => "Yay it worked.")
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Good.new(:uri_string => 'http://something.com')
+      end
+      $stdout.should_receive(:puts).with(/Checked\: http/).once
+      $stdout.should_receive(:puts).with(/Checked 1 link in 1 HTML file and found no errors/)
+      LinkChecker.new(:options => { :filename => 'whatever.txt' }).check_uris
+    end
+
+  end
+
+  describe "url processing from activerecord" do
+
+    it "retrieves url from activerecord" do
+      url_attribute = 'url'
+
+      url_record = double('url_record')
+      url_record.should_receive(url_attribute).and_return('http://www.example.com')
+
+      url_records_query = double('url_records_query')
+      url_records_query.should_receive(:each).and_yield(url_record)
+
+      check_uri = double('check_uri')
+      check_uri.should_receive(:join)
+      LinkChecker.any_instance.should_receive(:check_uri).and_return(check_uri)
+
+      LinkChecker.new(:options => {}).check_uris_from_activerecord(url_records_query, url_attribute)
+    end
+
+    it "processes the url if no block given" do
+      url_attribute = 'url'
+
+      url_record = double('url_record')
+      url_record.should_receive(url_attribute).and_return('http://www.example.com')
+
+      url_records_query = double('url_records_query')
+      url_records_query.should_receive(:each).and_yield(url_record)
+
+      FakeWeb.register_uri(:any, 'http://example.com', :body => "Yay it worked.")
+      LinkChecker.stub(:check_uri) do
+        LinkChecker::Good.new(:uri_string => 'http://something.com')
+      end
+      $stdout.should_receive(:puts).with(/Checked\: http/).once
+
+      LinkChecker.new(:options => {}).check_uris_from_activerecord(url_records_query, url_attribute)
+    end
+
+    it "calls the block if provided with the results of the uri check" do
+      url_attribute = 'url'
+
+      url_record = double('url_record')
+      url_record.should_receive(url_attribute).and_return('http://www.example.com')
+
+      url_records_query = double('url_records_query')
+      url_records_query.should_receive(:each).and_yield(url_record)
+
+      FakeWeb.register_uri(:any, 'http://example.com', :body => "Yay it worked.")
+      
+      expected_link_status = LinkChecker::Good.new(:uri_string => 'http://something.com')
+      LinkChecker.stub(:check_uri) do
+        expected_link_status
+      end
+      $stdout.should_receive(:puts).with(/Checked\: http/).once
+
+      LinkChecker.new(:options => {}).check_uris_from_activerecord(url_records_query, url_attribute) { |url, response|
+        url.should == url_record
+        response.should == expected_link_status
+      }
     end
 
   end
