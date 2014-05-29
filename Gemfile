@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "nokogiri", "~> 1.6.2.1"
+gem "nokogiri", "~> 1.6"
 gem "colorize", "~> 0.7.3"
 gem "anemone", "~> 0.7.2"
 gem "trollop", "~> 2.0"
