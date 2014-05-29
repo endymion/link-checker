@@ -1,6 +1,6 @@
-source :rubygems
+source 'https://rubygems.org'
 
-gem "nokogiri", "~> 1.5.5"
+gem "nokogiri"
 gem "colorize", "~> 0.5.8"
 gem "anemone", "~> 0.7.2"
 gem "trollop", "~> 2.0"
@@ -12,5 +12,5 @@ group(:test, :development) do
   gem "fakeweb", "~> 1.3.0"
   gem "yard", "~> 0.8.2.1"
   gem "redcarpet", "~> 2.1.1"
-  gem "debugger"
+  gem "byebug"
 end
