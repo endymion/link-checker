@@ -42,7 +42,7 @@ To crawl a live web site:
 
 ## Return value
 
-The ```check-links``` command will return a successful return value if there are no problems, or it will return an not-successful return code if it finds errors.  So you can use the return code to make decisions on the command line.  For example:
+The ```check-links``` command will return a successful return value if there are no problems, or it will return a not-successful return code if it finds errors.  So you can use the return code to make decisions on the command line.  For example:
 
     check-links 'public' && echo 'SUCCESS'
 
