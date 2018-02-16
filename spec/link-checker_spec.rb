@@ -11,19 +11,19 @@ describe LinkChecker do
 
     it "finds all of the HTML files in the target path." do
       files = LinkChecker.new(:target => @site_path).html_file_paths
-      files.size.should == 4
+      expect(files.size).to eq 4
     end
 
     it "finds all of the external links in an HTML file." do
       links = LinkChecker.external_link_uri_strings(
         open('spec/test-site/public/blog/2012/10/07/some-good-links/index.html'))
-      links.size.should == 4
+      expect(links.size).to eq 4
     end
 
     it "finds all of the external links in a string." do
       links = LinkChecker.external_link_uri_strings(
         open('spec/test-site/public/blog/2012/10/07/some-good-links/index.html').read)
-      links.size.should == 4
+      expect(links.size).to eq 4
     end
 
   end
@@ -42,11 +42,11 @@ describe LinkChecker do
     end
 
     it "declares good links to be good." do
-      LinkChecker.check_uri(@good_uri).class.should be LinkChecker::Good
+      expect(LinkChecker.check_uri(@good_uri).class).to be LinkChecker::Good
     end
 
     it "declares bad links to be bad." do
-      LinkChecker.check_uri(@bad_uri).class.should be LinkChecker::Error
+      expect(LinkChecker.check_uri(@bad_uri).class).to be LinkChecker::Error
     end
 
     describe "follows redirects to the destination and" do
@@ -55,15 +55,15 @@ describe LinkChecker do
         FakeWeb.register_uri(:get, @redirect_uri.to_s,
           :location => @good_uri.to_s, :status => ["302", "Moved"])
         result = LinkChecker.check_uri(@redirect_uri)
-        result.class.should be LinkChecker::Redirect
-        result.final_destination_uri_string.should == @good_uri.to_s
+        expect(result.class).to be LinkChecker::Redirect
+        expect(result.final_destination_uri_string).to eq @good_uri.to_s
       end
 
       it "declares bad redirect targets to be bad." do
           FakeWeb.register_uri(:get, @redirect_uri.to_s,
             :location => @bad_uri.to_s, :status => ["302", "Moved"])
         result = LinkChecker.check_uri(@redirect_uri)
-        result.class.should be LinkChecker::Error
+        expect(result.class).to be LinkChecker::Error
       end
 
     end
@@ -82,8 +82,8 @@ describe LinkChecker do
         destination = URI('http://relative.com/somewhere/else/')
       	FakeWeb.register_uri(:get, destination.to_s, :body => 'Yay, it worked!')
         result = LinkChecker.check_uri(www_relative_com)
-        result.class.should be LinkChecker::Redirect
-        result.final_destination_uri_string.should == destination.to_s
+        expect(result.class).to be LinkChecker::Redirect
+        expect(result.final_destination_uri_string).to eq destination.to_s
       end
     end
 
@@ -105,11 +105,11 @@ describe LinkChecker do
       end
       $stdout.should_receive(:puts).with(/Checked\: .*\.html/).once
       $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found no errors/)
-      LinkChecker.new(
+      expect(LinkChecker.new(
         :target => @site_path,
         # This is to make sure that the entire LinkChecker#wait_to_spawn_thread gets hit during testing.
         :options => { :max_threads => 1 }
-      ).check_uris.should == 0 # Return value: good
+      ).check_uris).to eq 0 # Return value: good
     end
 
     it "prints red when the links are bad." do
@@ -123,7 +123,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Link\: http/).exactly(20).times
       $stdout.should_receive(:puts).with(/Response/).exactly(20).times
       $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found 20 errors/)
-      LinkChecker.new(:target => @site_path).check_uris.should == 1 # Return value: error
+      expect(LinkChecker.new(:target => @site_path).check_uris).to eq 1 # Return value: error
     end
 
     it "prints yellow warnings when the links redirect." do
@@ -137,7 +137,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Warning/).exactly(20).times
       $stdout.should_receive(:puts).with(/Redirected/).exactly(20).times
       $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found no errors/)
-      LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
+      expect(LinkChecker.new(:target => @site_path).check_uris).to eq 0 # Return value: good
     end
 
     it "prints errors when there are warnings with the --warnings_are_errors option." do
@@ -151,10 +151,10 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Link/).exactly(20).times
       $stdout.should_receive(:puts).with(/Redirected/).exactly(20).times
       $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found 20 errors/)
-      LinkChecker.new(
+      expect(LinkChecker.new(
         :target => @site_path,
         :options => { :warnings_are_errors => true }
-      ).check_uris.should == 1 # Return value: error
+      ).check_uris).to eq 1 # Return value: error
     end
 
     it "does not print warnings when the links redirect with the --no-warnings option." do
@@ -168,7 +168,7 @@ describe LinkChecker do
       $stdout.should_receive(:puts).with(/Warning/).exactly(20).times
       $stdout.should_receive(:puts).with(/Redirected/).exactly(20).times
       $stdout.should_receive(:puts).with(/Checked 20 links in 1 HTML file and found no errors/)
-      LinkChecker.new(:target => @site_path).check_uris.should == 0 # Return value: good
+      expect(LinkChecker.new(:target => @site_path).check_uris).to eq 0 # Return value: good
     end
 
   end
