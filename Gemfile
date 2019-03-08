@@ -1,16 +1,16 @@
 source 'https://rubygems.org'
 
-gem "nokogiri", "~> 1.6"
-gem "colorize", "~> 0.7.3"
+gem "nokogiri", "~> 1.10"
+gem "colorize", "~> 0.8.1"
 gem "anemone", "~> 0.7.2"
-gem "trollop", "~> 2.0"
+gem "optimist", "~> 3.0"
 
 group(:test, :development) do
-  gem "rspec", "~> 2.14.1"
-  gem "jeweler", "~> 2.0.1"
-  gem "simplecov", "~> 0.8.2"
-  gem "fakeweb", "~> 1.3.0"
-  gem "yard", "~> 0.8.7.4"
-  gem "redcarpet", "~> 3.1.2"
-  gem "byebug", "~> 3.1.2"
+  gem "rspec", "~> 3.8"
+  gem "juwelier", "~> 2.4.9"
+  gem "simplecov", "~> 0.9"
+  gem 'fakeweb', :git => 'https://github.com/chrisk/fakeweb.git'
+  gem "yard", "~> 0.9.18"
+  gem "redcarpet", "~> 3.4"
+  gem "byebug", "~> 11.0.0"
 end
