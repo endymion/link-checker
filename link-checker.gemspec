@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Ryan Alyn Porter".freeze]
-  s.date = "2019-03-08"
+  s.date = "2019-03-09"
   s.description = "A Ruby gem for checking the links in a web site. Can either scan files or crawl pages. Multi-threaded, with red/green colored output, support for SSL, and support for following redirects. Works great with Octopress, Jekyll, or any collection of static HTML files. With 100% RSpec coverage.".freeze
   s.executables = ["check-links".freeze]
   s.extra_rdoc_files = [

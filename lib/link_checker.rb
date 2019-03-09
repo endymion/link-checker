@@ -76,6 +76,8 @@ class LinkChecker
               URI.join("#{uri.scheme}://#{uri.host}:#{uri.port}", response['location'])
             end          
           return self.check_uri(uri, true)
+        when Net::HTTPUnknownResponse then
+          return Redirect.new(:final_destination_uri_string => uri.to_s)
         else
           return Error.new(:uri_string => uri.to_s, :error => response)
         end
