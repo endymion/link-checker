@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'link_checker'
-require 'trollop'
+require 'optimist'
 
-options = Trollop::options do
+options = Optimist::options do
 	opt :no_warnings, "Don't warn about redirects to valid links"
 	opt :warnings_are_errors, "Treat any warning as an error and produce an error return code"
 	opt :max_threads, "The maximum number of threads to start.", :default => 100

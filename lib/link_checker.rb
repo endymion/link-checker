@@ -5,8 +5,11 @@ require 'net/https'
 require 'uri'
 require 'colorize'
 require 'anemone'
+require 'thread'
 
 class LinkChecker
+
+  SEMAPHORE = Mutex.new
 
   # Create a new instance of LinkChecker
   #
@@ -73,6 +76,8 @@ class LinkChecker
               URI.join("#{uri.scheme}://#{uri.host}:#{uri.port}", response['location'])
             end          
           return self.check_uri(uri, true)
+        when Net::HTTPUnknownResponse then
+          return Redirect.new(:final_destination_uri_string => uri.to_s)
         else
           return Error.new(:uri_string => uri.to_s, :error => response)
         end
@@ -149,16 +154,16 @@ class LinkChecker
       threads = []
       results = []
       self.class.external_link_uri_strings(page).each do |uri_string|
-        Thread.exclusive { @links << page }
+        SEMAPHORE.synchronize { @links << page }
         wait_to_spawn_thread
         threads << Thread.new do
           begin
             uri = URI(uri_string)
             response = self.class.check_uri(uri)
             response.uri_string = uri_string
-            Thread.exclusive { results << response }
+            SEMAPHORE.synchronize { results << response }
           rescue => error
-            Thread.exclusive { results <<
+            SEMAPHORE.synchronize { results <<
               Error.new( :error => error.to_s, :uri_string => uri_string) }
           end
         end
@@ -181,7 +186,7 @@ class LinkChecker
       errors = errors + warnings
       warnings = []
     end
-    Thread.exclusive do
+    SEMAPHORE.synchronize do
       # Store the results in the LinkChecker instance.
       # This must be thread-exclusive to avoid a race condition.
       @errors = @errors.concat(errors)
