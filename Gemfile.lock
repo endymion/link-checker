@@ -21,12 +21,10 @@ GEM
       git (>= 1.2.5)
       rake
       rdoc
-    json (1.7.7)
     multi_json (1.6.1)
     nokogiri (1.5.6)
     rake (10.0.3)
-    rdoc (3.12.1)
-      json (~> 1.4)
+    rdoc (6.3.2)
     redcarpet (2.1.1)
     robotex (1.0.0)
     rspec (2.11.0)
